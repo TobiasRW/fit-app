@@ -41,12 +41,28 @@ export default function SignupPage() {
         </div>
       )}
       <Form action={formAction} className="flex flex-col space-y-4">
-        <Input id="email" name="email" type="email" label="Email:" required />
+        <Input
+          id="name"
+          name="name"
+          type="text"
+          label="Name:"
+          placeholder="Enter your name"
+          required
+        />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          label="Email:"
+          placeholder="Enter your email"
+          required
+        />
         <Input
           id="password"
           name="password"
           type="password"
           label="Password:"
+          placeholder="Enter your password"
           required
         />
         <Input
@@ -54,6 +70,7 @@ export default function SignupPage() {
           name="confirmPassword"
           type="password"
           label="Confirm Password:"
+          placeholder="Confirm your password"
           required
         />
         <Button text="Sign up" disabled={pending} />

@@ -20,6 +20,7 @@ export async function signup(
   const data = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
+    name: formData.get("name") as string,
     confirmPassword: formData.get("confirmPassword") as string,
   };
 
@@ -36,6 +37,11 @@ export async function signup(
   const { error } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
+    options: {
+      data: {
+        display_name: data.name,
+      },
+    },
   });
 
   if (error) {

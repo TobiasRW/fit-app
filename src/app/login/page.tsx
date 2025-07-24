@@ -29,12 +29,20 @@ export default function LoginPage() {
       )}
 
       <Form action={formAction} className="flex flex-col space-y-4">
-        <Input id="email" name="email" type="email" label="Email:" required />
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          label="Email:"
+          placeholder="Enter your email"
+          required
+        />
         <Input
           id="password"
           name="password"
           type="password"
           label="Password:"
+          placeholder="Enter your password"
           required
         />
 
