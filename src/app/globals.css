@@ -59,7 +59,6 @@ h6 {
   font-family: var(--font-heading);
 }
 p,
-span,
 a {
   font-family: var(--font-body);
 }
