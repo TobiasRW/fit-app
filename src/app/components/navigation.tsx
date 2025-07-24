@@ -13,7 +13,7 @@ export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex bg-white py-4 px-6 justify-between items-center fixed bottom-0 left-0 right-0">
+    <nav className="fixed right-0 bottom-0 left-0 flex items-center justify-between bg-white px-6 py-4">
       <Link
         href="/"
         className={`flex flex-col items-center ${
@@ -21,7 +21,7 @@ export default function Navigation() {
         }`}
       >
         <HouseSimpleIcon size={32} weight="light" />
-        <span className="text-xs ">Home</span>
+        <span className="text-xs">Home</span>
       </Link>
       <Link
         href="/stats"
@@ -30,7 +30,7 @@ export default function Navigation() {
         }`}
       >
         <ChartPieSliceIcon size={32} weight="light" />
-        <span className="text-xs ">Stats</span>
+        <span className="text-xs">Stats</span>
       </Link>
       <Link
         href="/workouts"
@@ -39,7 +39,7 @@ export default function Navigation() {
         }`}
       >
         <BarbellIcon size={32} weight="light" />
-        <span className="text-xs ">Workouts</span>
+        <span className="text-xs">Workouts</span>
       </Link>
       <Link
         href="/profile"
@@ -48,7 +48,7 @@ export default function Navigation() {
         }`}
       >
         <UserIcon size={32} weight="light" />
-        <span className="text-xs ">Profile</span>
+        <span className="text-xs">Profile</span>
       </Link>
     </nav>
   );

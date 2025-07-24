@@ -11,7 +11,7 @@ type initialState = {
 
 export async function signup(
   prevState: initialState,
-  formData: FormData
+  formData: FormData,
 ): Promise<initialState> {
   const supabase = await createClient();
 

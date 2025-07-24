@@ -23,7 +23,7 @@ export default function Input({
   };
   return (
     <div className="flex flex-col space-y-1">
-      {label && <label className=" font-medium">{label}</label>}
+      {label && <label className="font-medium">{label}</label>}
       <input
         className={`${variants[variant]}`}
         placeholder={placeholder}

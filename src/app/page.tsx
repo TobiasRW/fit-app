@@ -8,7 +8,7 @@ export default async function Home() {
 
   console.log("User:", user);
   return (
-    <main className="w-11/12 mx-auto mt-10">
+    <main className="mx-auto mt-10 w-11/12">
       <h1 className="text-4xl font-bold">
         Hey,{" "}
         <span className="text-green">

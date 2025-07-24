@@ -15,15 +15,15 @@ const initialState = {
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, initialState);
   return (
-    <main className="w-11/12 mx-auto">
-      <div className="flex mt-20 mb-10 justify-center items-center flex-col space-y-4">
+    <main className="mx-auto w-11/12">
+      <div className="mt-20 mb-10 flex flex-col items-center justify-center space-y-4">
         <BarbellIcon size={64} weight="fill" className="text-green" />
         <h1 className="text-2xl font-bold">Welcome to Fit App</h1>
         <p className="text-foreground">Please log in or sign up to continue</p>
       </div>
 
       {state?.error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+        <div className="mb-4 rounded border border-red-400 bg-red-100 p-3 text-red-700">
           {state.error}
         </div>
       )}
