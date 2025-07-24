@@ -19,7 +19,7 @@ export default function Input({
 }: InputProps) {
   const variants = {
     outlined: "border border-gray-300 rounded-md p-2 ",
-    filled: "bg-gray-100 rounded-md p-2",
+    filled: "bg-background rounded-md p-2",
   };
   return (
     <div className="flex flex-col space-y-1">
