@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Navigation from "./components/navigation";
 
 const plein = localFont({
   src: "../fonts/Plein-Variable.ttf",
@@ -27,7 +26,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${plein.variable} ${archivo.variable} antialiased`}>
         {children}
-        <Navigation />
       </body>
     </html>
   );

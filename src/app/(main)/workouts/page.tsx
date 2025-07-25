@@ -1,5 +1,5 @@
-import CreateWorkout from "../components/create-workout-card";
-import WorkoutCard from "../components/workout-card";
+import CreateWorkout from "../../components/create-workout-card";
+import WorkoutCard from "../../components/workout-card";
 import { getUserWorkoutPlans } from "./actions";
 
 export default async function Page() {
