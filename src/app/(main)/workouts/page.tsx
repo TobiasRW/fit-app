@@ -1,4 +1,4 @@
-import CreateWorkout from "../../components/create-workout-card";
+import CreateWorkoutModal from "@/app/components/create-workout-modal";
 import WorkoutCard from "../../components/workout-card";
 import { getUserWorkoutPlans } from "./actions";
 
@@ -22,12 +22,13 @@ export default async function Page() {
         </div>
       ) : (
         <div className="mt-8 py-12 text-center">
-          <p className="text-lg text-gray-500">
-            No workout plans yet. Create your first one above!
+          <p className="text-foreground/50 text-lg">
+            No workout plans created yet. Click the button below to create your
+            first workout plan <span className="text-foreground">💪</span>
           </p>
         </div>
       )}
-      {workoutPlans.length <= 4 && <CreateWorkout />}
+      {workoutPlans.length <= 4 && <CreateWorkoutModal />}
     </main>
   );
 }
