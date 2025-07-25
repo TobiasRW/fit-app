@@ -1,10 +1,10 @@
 import { getWorkoutPlan } from "../actions";
 
-type Props = {
-  params: { id: string };
-};
-
-export default async function Page({ params }: Props) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const workoutPlan = await getWorkoutPlan(id);
 
