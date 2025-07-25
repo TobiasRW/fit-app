@@ -5,7 +5,8 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const workoutPlan = await getWorkoutPlan(params.id);
+  const { id } = await params;
+  const workoutPlan = await getWorkoutPlan(id);
 
   return (
     <main className="mx-auto mt-10 w-11/12">
