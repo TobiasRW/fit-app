@@ -67,15 +67,21 @@ export default function SearchDropdown({
 
   return (
     <div ref={dropdownRef} className="relative w-full">
-      <label className="mb-2 block text-sm font-medium">{label}</label>
-
       <Input
+        label={label}
         ref={inputRef}
         type="text"
         value={getDisplayValue()}
         onChange={(e) => {
-          setQuery(e.target.value);
+          const newValue = e.target.value;
+          setQuery(newValue);
           setIsOpen(true); // Open dropdown when typing
+
+          // Clear selected value when user starts typing something different
+          if (newValue !== selectedValue) {
+            setSelectedValue("");
+            onSelect?.(""); // Notify parent that selection was cleared
+          }
         }}
         onFocus={() => setIsOpen(true)}
         placeholder={placeholder}
@@ -88,8 +94,8 @@ export default function SearchDropdown({
               <div
                 key={index}
                 onClick={() => handleSelect(option)}
-                className={`flex cursor-pointer items-center justify-between px-3 py-2 ${
-                  option === selectedValue ? "text-green" : ""
+                className={`flex cursor-pointer items-center justify-between px-3 py-2 hover:bg-gray-100 ${
+                  option === selectedValue ? "text-green bg-green/10" : ""
                 }`}
               >
                 {option}
