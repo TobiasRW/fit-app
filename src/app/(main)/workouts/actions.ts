@@ -32,6 +32,7 @@ export async function getUserWorkoutPlans() {
   return workoutPlans || [];
 }
 
+// Function to get a specific workout plan by ID
 export async function getWorkoutPlan(id: string) {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
@@ -42,7 +43,17 @@ export async function getWorkoutPlan(id: string) {
 
   const { data: workoutPlan, error } = await supabase
     .from("workout_plans")
-    .select("id, name")
+    .select(
+      `
+      id, 
+      name,
+      workouts (
+        id,
+        name,
+        order_index
+      )
+    `,
+    )
     .eq("id", id)
     .eq("user_id", user.data.user.id)
     .single();
@@ -105,4 +116,74 @@ export async function createWorkoutPlan(
       error: "An unexpected error occurred. Please try again.",
     };
   }
+}
+
+// Function to add a workout to a specific workout plan
+export async function addWorkoutToPlan(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+
+    if (!user.data.user) {
+      return { error: "User not authenticated" };
+    }
+
+    const planId = formData.get("planId") as string;
+    const workoutName = formData.get("workoutName") as string;
+
+    if (!workoutName) {
+      return { error: "Workout name is required" };
+    }
+
+    // Get current workout count for order_index
+    const { count } = await supabase
+      .from("workouts")
+      .select("*", { count: "exact", head: true })
+      .eq("plan_id", planId);
+
+    // Insert new workout
+    const { error } = await supabase.from("workouts").insert({
+      plan_id: planId,
+      name: workoutName,
+      order_index: (count || 0) + 1,
+    });
+
+    if (error) {
+      if (error.code === "23505") {
+        return {
+          error: "A workout with this name already exists in this plan",
+        };
+      }
+      return { error: "Failed to create workout. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planId}`);
+    return { success: true };
+  } catch (error) {
+    return { error: "An unexpected error occurred. Please try again." };
+  }
+}
+
+// Function to get all exercises from the database
+export async function getAllExercises() {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data: exercises, error } = await supabase
+    .from("exercises")
+    .select("id, name")
+    .order("name", { ascending: true });
+
+  if (error) {
+    throw new Error("Failed to fetch exercises");
+  }
+
+  return exercises || [];
 }

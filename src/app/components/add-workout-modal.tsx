@@ -4,20 +4,20 @@ import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { PlusIcon, XIcon } from "@phosphor-icons/react";
 import Form from "next/form";
-import { createWorkoutPlan } from "../(main)/workouts/actions";
 import Input from "./input";
 import Button from "./button";
 import { useActionState } from "react";
+import { addWorkoutToPlan } from "../(main)/workouts/actions";
 
 const initialState = {
   error: undefined,
   success: undefined,
 };
 
-export default function CreateWorkoutModal() {
+export default function AddWorkoutModal({ planId }: { planId: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [state, formAction, pending] = useActionState(
-    createWorkoutPlan,
+    addWorkoutToPlan,
     initialState,
   );
 
@@ -57,7 +57,7 @@ export default function CreateWorkoutModal() {
               className="fixed right-0 bottom-0 left-0 h-5/6 space-y-4 rounded-t-2xl bg-white pt-4 shadow-lg"
             >
               <div className="mx-auto flex w-11/12 items-center justify-between">
-                <h2 className="text-2xl font-semibold">New workout plan</h2>
+                <h2 className="text-2xl font-semibold">New workout</h2>
                 <XIcon
                   size={26}
                   className="text-foreground"
@@ -71,13 +71,49 @@ export default function CreateWorkoutModal() {
               >
                 <Input
                   type="text"
-                  id="name"
-                  name="name"
-                  label="Workout Plan Name"
+                  id="workoutName"
+                  name="workoutName"
+                  label="Workout name"
                   required
-                  placeholder="Enter workout plan name"
+                  placeholder="Enter workout name"
                 />
-                <Button text="Create Workout Plan" disabled={pending} />
+
+                <input type="hidden" name="planId" value={planId} />
+
+                {/* <h3 className="text-2xl font-semibold">Exercises</h3>
+                <div className="flex gap-4">
+                  <div className="min-w-0 flex-[2]">
+                    <SearchDropdown
+                      label="Exercise"
+                      placeholder="Type to search..."
+                      options={exerciseNames}
+                      onSelect={(value) => {
+                        setSelectedExercise(value);
+                      }}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <Input
+                      type="text"
+                      id="sets"
+                      name="sets"
+                      label="Sets"
+                      placeholder="Sets"
+                      required
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <Input
+                      type="text"
+                      id="reps"
+                      name="reps"
+                      label="Reps"
+                      placeholder="Reps"
+                      required
+                    />
+                  </div>
+                </div> */}
+                <Button text="Create Workout" />
               </Form>
               {state?.error && (
                 <div className="mx-auto w-11/12 rounded border border-red-400 bg-red-100 p-3 text-red-700">
