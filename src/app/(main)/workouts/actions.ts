@@ -10,7 +10,7 @@ type initialState = {
   success?: boolean;
 };
 
-// Function to get the user's workout plans
+// Function to get all the user's workout plans
 export async function getUserWorkoutPlans() {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
@@ -21,7 +21,7 @@ export async function getUserWorkoutPlans() {
 
   const { data: workoutPlans, error } = await supabase
     .from("workout_plans")
-    .select("id, name")
+    .select("id, name, slug")
     .eq("user_id", user.data.user.id)
     .order("created_at", { ascending: false });
 
@@ -32,8 +32,8 @@ export async function getUserWorkoutPlans() {
   return workoutPlans || [];
 }
 
-// Function to get a specific workout plan by ID
-export async function getWorkoutPlan(id: string) {
+// Function to get a specific workout plan by slug
+export async function getWorkoutPlan(slug: string) {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
@@ -47,14 +47,16 @@ export async function getWorkoutPlan(id: string) {
       `
       id, 
       name,
+      slug,
       workouts (
         id,
         name,
+        slug,
         order_index
       )
     `,
     )
-    .eq("id", id)
+    .eq("slug", slug)
     .eq("user_id", user.data.user.id)
     .single();
 
@@ -65,7 +67,7 @@ export async function getWorkoutPlan(id: string) {
   return workoutPlan;
 }
 
-// Function to create a new workout plan
+// Function to create a new workout plan for the user
 export async function createWorkoutPlan(
   prevState: initialState,
   formData: FormData,
@@ -85,12 +87,16 @@ export async function createWorkoutPlan(
       return { error: "Workout plan name is required" };
     }
 
+    // Generate a slug from the name
+    const slug = generateSlug(name);
+
     // Insert the new workout plan into the database
     const { error } = await supabase
       .from("workout_plans")
       .insert({
         user_id: user.data.user.id,
         name: name.trim(),
+        slug: slug,
       })
       .select()
       .single();
@@ -118,6 +124,41 @@ export async function createWorkoutPlan(
   }
 }
 
+// Function to get a specific workout in a plan
+export async function getWorkoutFromPlan(
+  planSlug: string,
+  workoutSlug: string,
+) {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data: workout, error } = await supabase
+    .from("workouts")
+    .select(
+      `
+      id, 
+      name, 
+      slug, 
+      order_index,
+      workout_plans!inner()
+    `,
+    )
+    .eq("slug", workoutSlug)
+    .eq("workout_plans.slug", planSlug)
+    .eq("workout_plans.user_id", user.data.user.id)
+    .single();
+
+  if (error || !workout) {
+    notFound();
+  }
+
+  return workout;
+}
+
 // Function to add a workout to a specific workout plan
 export async function addWorkoutToPlan(
   prevState: initialState,
@@ -132,11 +173,14 @@ export async function addWorkoutToPlan(
     }
 
     const planId = formData.get("planId") as string;
+    const planSlug = formData.get("planSlug") as string;
     const workoutName = formData.get("workoutName") as string;
 
     if (!workoutName) {
       return { error: "Workout name is required" };
     }
+
+    const slug = generateSlug(workoutName);
 
     // Get current workout count for order_index
     const { count } = await supabase
@@ -148,6 +192,7 @@ export async function addWorkoutToPlan(
     const { error } = await supabase.from("workouts").insert({
       plan_id: planId,
       name: workoutName,
+      slug: slug,
       order_index: (count || 0) + 1,
     });
 
@@ -160,7 +205,7 @@ export async function addWorkoutToPlan(
       return { error: "Failed to create workout. Please try again." };
     }
 
-    revalidatePath(`/workouts/${planId}`);
+    revalidatePath(`/workouts/${planSlug}`);
     return { success: true };
   } catch (error) {
     return { error: "An unexpected error occurred. Please try again." };
@@ -186,4 +231,14 @@ export async function getAllExercises() {
   }
 
   return exercises || [];
+}
+
+//____________________ HELPER FUNCTIONS ____________________
+
+// generate slug
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }

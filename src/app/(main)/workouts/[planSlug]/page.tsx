@@ -1,13 +1,14 @@
 import AddWorkoutModal from "@/app/components/add-workout-modal";
 import { getWorkoutPlan } from "../actions";
+import Link from "next/link";
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ planSlug: string }>;
 }) {
-  const { id } = await params;
-  const workoutPlan = await getWorkoutPlan(id);
+  const { planSlug } = await params;
+  const workoutPlan = await getWorkoutPlan(planSlug);
 
   return (
     <main className="mx-auto mt-10 w-11/12">
@@ -18,10 +19,15 @@ export default async function Page({
           <div className="mt-8">
             <div className="grid grid-cols-1 gap-4">
               {workoutPlan.workouts.map((workout) => (
-                <div key={workout.id} className="rounded-lg border p-4">
-                  <h2 className="text-xl font-semibold">{workout.name}</h2>
-                  <p>Order: {workout.order_index}</p>
-                </div>
+                <Link
+                  key={workout.id}
+                  href={`/workouts/${workoutPlan.slug}/${workout.slug}`}
+                >
+                  <div className="rounded-lg border p-4">
+                    <h2 className="text-xl font-semibold">{workout.name}</h2>
+                    <p>Order: {workout.order_index}</p>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>
@@ -34,7 +40,9 @@ export default async function Page({
           </div>
         )}
 
-        {workoutPlan.workouts.length <= 7 && <AddWorkoutModal planId={id} />}
+        {workoutPlan.workouts.length <= 7 && (
+          <AddWorkoutModal planId={workoutPlan.id} />
+        )}
       </div>
     </main>
   );

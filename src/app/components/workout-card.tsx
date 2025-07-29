@@ -2,13 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 
 type WorkoutCardProps = {
-  id: string;
   name: string;
+  slug: string;
 };
 
-export default function WorkoutCard({ id, name }: WorkoutCardProps) {
+export default function WorkoutCard({ name, slug }: WorkoutCardProps) {
   return (
-    <Link href={`/workouts/${id}`}>
+    <Link href={`/workouts/${slug}`}>
       <div className="bg-gray flex h-20 cursor-pointer items-center overflow-hidden rounded-lg drop-shadow-md">
         <div className="mx-auto w-11/12">
           <h2 className="text-xl font-bold">{name}</h2>
