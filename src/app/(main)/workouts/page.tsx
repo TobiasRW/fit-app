@@ -16,7 +16,12 @@ export default async function Page() {
         <div className="mt-8">
           <div className="grid grid-cols-1 gap-4">
             {workoutPlans.map((plan) => (
-              <WorkoutCard key={plan.slug} name={plan.name} slug={plan.slug} />
+              <WorkoutCard
+                key={plan.slug}
+                name={plan.name}
+                planSlug={plan.slug}
+                variant="plan"
+              />
             ))}
           </div>
         </div>

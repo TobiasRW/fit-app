@@ -1,6 +1,7 @@
 import AddWorkoutModal from "@/app/components/add-workout-modal";
 import { getWorkoutPlan } from "../actions";
 import Link from "next/link";
+import WorkoutCard from "@/app/components/workout-card";
 
 export default async function Page({
   params,
@@ -19,15 +20,13 @@ export default async function Page({
           <div className="mt-8">
             <div className="grid grid-cols-1 gap-4">
               {workoutPlan.workouts.map((workout) => (
-                <Link
-                  key={workout.id}
-                  href={`/workouts/${workoutPlan.slug}/${workout.slug}`}
-                >
-                  <div className="rounded-lg border p-4">
-                    <h2 className="text-xl font-semibold">{workout.name}</h2>
-                    <p>Order: {workout.order_index}</p>
-                  </div>
-                </Link>
+                <WorkoutCard
+                  key={workout.slug}
+                  name={workout.name}
+                  planSlug={workoutPlan.slug}
+                  workoutSlug={workout.slug}
+                  variant="workout"
+                />
               ))}
             </div>
           </div>
