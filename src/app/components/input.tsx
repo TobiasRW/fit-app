@@ -1,15 +1,16 @@
 type InputProps = {
   label?: string;
-  variant?: "outlined" | "filled";
+  variant?: "outlined" | "filled" | "borderless";
   placeholder?: string;
   type?: string;
   id?: string;
   name?: string;
-  min?: string;
-  max?: string;
+  min?: string | number;
+  max?: string | number;
+  disabled?: boolean;
   required?: boolean;
   ref?: React.Ref<HTMLInputElement>;
-  value?: string;
+  value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
 };
@@ -25,6 +26,7 @@ export default function Input({
   max,
   required = false,
   ref,
+  disabled,
   value,
   onChange,
   onFocus,
@@ -32,6 +34,7 @@ export default function Input({
   const variants = {
     outlined: "border border-gray-300 rounded-md p-2 ",
     filled: "bg-background rounded-md p-2",
+    borderless: "bg-transparent p-2 text-center focus:outline-none text-lg",
   };
   return (
     <div className="flex flex-col space-y-1">
@@ -43,6 +46,7 @@ export default function Input({
         id={id}
         name={name}
         required={required}
+        disabled={disabled}
         min={min}
         max={max}
         ref={ref}

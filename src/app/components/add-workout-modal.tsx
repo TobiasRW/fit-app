@@ -79,40 +79,6 @@ export default function AddWorkoutModal({ planId }: { planId: string }) {
                 />
 
                 <input type="hidden" name="planId" value={planId} />
-
-                {/* <h3 className="text-2xl font-semibold">Exercises</h3>
-                <div className="flex gap-4">
-                  <div className="min-w-0 flex-[2]">
-                    <SearchDropdown
-                      label="Exercise"
-                      placeholder="Type to search..."
-                      options={exerciseNames}
-                      onSelect={(value) => {
-                        setSelectedExercise(value);
-                      }}
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <Input
-                      type="text"
-                      id="sets"
-                      name="sets"
-                      label="Sets"
-                      placeholder="Sets"
-                      required
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <Input
-                      type="text"
-                      id="reps"
-                      name="reps"
-                      label="Reps"
-                      placeholder="Reps"
-                      required
-                    />
-                  </div>
-                </div> */}
                 <Button text="Create Workout" />
               </Form>
               {state?.error && (

@@ -10,6 +10,21 @@ type initialState = {
   success?: boolean;
 };
 
+// Define the type for the workout exercise query result
+type WorkoutExerciseQueryResult = {
+  id: string;
+  order_index: number;
+  exercises: {
+    id: string;
+    name: string;
+  };
+  sets: {
+    id: string;
+    set_number: number;
+    target_reps: number;
+  }[];
+};
+
 // Function to get all the user's workout plans
 export async function getUserWorkoutPlans() {
   const supabase = await createClient();
@@ -212,6 +227,100 @@ export async function addWorkoutToPlan(
   }
 }
 
+// Function to add a exercise to a workout
+export async function addExerciseToWorkout(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+
+    if (!user.data.user) {
+      return { error: "User not authenticated" };
+    }
+
+    // get data from form
+    const workoutId = formData.get("workoutId") as string;
+    const planSlug = formData.get("planSlug") as string;
+    const workoutSlug = formData.get("workoutSlug") as string;
+    const exerciseId = formData.get("exerciseId") as string;
+
+    // Get all the setReps values as an array
+    const setReps = formData
+      .getAll("setReps")
+      .map((rep) => parseInt(rep as string));
+
+    // Get current exercise count for order_index
+    const { count } = await supabase
+      .from("workout_exercises")
+      .select("*", { count: "exact", head: true })
+      .eq("workout_id", workoutId);
+
+    // Use RPC function
+    const { error } = await supabase.rpc("add_exercise_with_sets", {
+      p_workout_id: workoutId,
+      p_exercise_id: exerciseId,
+      p_order_index: (count || 0) + 1,
+      p_set_reps: setReps,
+    });
+
+    if (error) {
+      return { error: "Failed to add exercise to workout. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error adding exercise to workout:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+// Function to get exercises from a workout
+export async function getExercisesFromWorkout(workoutId: string) {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data: workoutExercises, error } = await supabase
+    .from("workout_exercises")
+    .select(
+      `
+      id,
+      order_index,
+      exercises!inner (
+        id,
+        name
+      ),
+      sets (
+        id,
+        set_number,
+        target_reps
+      )
+    `,
+    )
+    .eq("workout_id", workoutId)
+    .order("order_index", { ascending: true })
+    .overrideTypes<WorkoutExerciseQueryResult[]>();
+
+  if (error) {
+    throw new Error("Failed to fetch exercises from workout");
+  }
+
+  // Sort sets by set_number and return the result
+  return (
+    workoutExercises?.map((exercise) => ({
+      ...exercise,
+      sets: exercise.sets?.sort((a, b) => a.set_number - b.set_number) || [],
+    })) || []
+  );
+}
 // Function to get all exercises from the database
 export async function getAllExercises() {
   const supabase = await createClient();
