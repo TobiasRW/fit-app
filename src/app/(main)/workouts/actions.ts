@@ -25,6 +25,8 @@ type WorkoutExerciseQueryResult = {
   }[];
 };
 
+//_____________________ READ FUNCTIONS (GET) _____________________
+
 // Function to get all the user's workout plans
 export async function getUserWorkoutPlans() {
   const supabase = await createClient();
@@ -83,6 +85,106 @@ export async function getWorkoutPlan(slug: string) {
   return workoutPlan;
 }
 
+// Function to get a specific workout in a plan
+export async function getWorkoutFromPlan(
+  planSlug: string,
+  workoutSlug: string,
+) {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data: workout, error } = await supabase
+    .from("workouts")
+    .select(
+      `
+      id, 
+      name, 
+      slug, 
+      order_index,
+      workout_plans!inner()
+    `,
+    )
+    .eq("slug", workoutSlug)
+    .eq("workout_plans.slug", planSlug)
+    .eq("workout_plans.user_id", user.data.user.id)
+    .single();
+
+  if (error || !workout) {
+    notFound();
+  }
+
+  return workout;
+}
+
+// Function to get exercises from a workout
+export async function getExercisesFromWorkout(workoutId: string) {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data: workoutExercises, error } = await supabase
+    .from("workout_exercises")
+    .select(
+      `
+      id,
+      order_index,
+      exercises!inner (
+        id,
+        name
+      ),
+      sets (
+        id,
+        set_number,
+        target_reps
+      )
+    `,
+    )
+    .eq("workout_id", workoutId)
+    .order("order_index", { ascending: true })
+    .overrideTypes<WorkoutExerciseQueryResult[]>();
+
+  if (error) {
+    throw new Error("Failed to fetch exercises from workout");
+  }
+
+  // Sort sets by set_number and return the result
+  return (
+    workoutExercises?.map((exercise) => ({
+      ...exercise,
+      sets: exercise.sets?.sort((a, b) => a.set_number - b.set_number) || [],
+    })) || []
+  );
+}
+// Function to get all exercises from the database
+export async function getAllExercises() {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data: exercises, error } = await supabase
+    .from("exercises")
+    .select("id, name")
+    .order("name", { ascending: true });
+
+  if (error) {
+    throw new Error("Failed to fetch exercises");
+  }
+
+  return exercises || [];
+}
+
+//_____________________ CREATE FUNCTIONS (POST) _____________________
+
 // Function to create a new workout plan for the user
 export async function createWorkoutPlan(
   prevState: initialState,
@@ -138,41 +240,6 @@ export async function createWorkoutPlan(
       error: "An unexpected error occurred. Please try again.",
     };
   }
-}
-
-// Function to get a specific workout in a plan
-export async function getWorkoutFromPlan(
-  planSlug: string,
-  workoutSlug: string,
-) {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
-
-  const { data: workout, error } = await supabase
-    .from("workouts")
-    .select(
-      `
-      id, 
-      name, 
-      slug, 
-      order_index,
-      workout_plans!inner()
-    `,
-    )
-    .eq("slug", workoutSlug)
-    .eq("workout_plans.slug", planSlug)
-    .eq("workout_plans.user_id", user.data.user.id)
-    .single();
-
-  if (error || !workout) {
-    notFound();
-  }
-
-  return workout;
 }
 
 // Function to add a workout to a specific workout plan
@@ -278,69 +345,6 @@ export async function addExerciseToWorkout(
       error: "An unexpected error occurred. Please try again.",
     };
   }
-}
-
-// Function to get exercises from a workout
-export async function getExercisesFromWorkout(workoutId: string) {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
-
-  const { data: workoutExercises, error } = await supabase
-    .from("workout_exercises")
-    .select(
-      `
-      id,
-      order_index,
-      exercises!inner (
-        id,
-        name
-      ),
-      sets (
-        id,
-        set_number,
-        target_reps
-      )
-    `,
-    )
-    .eq("workout_id", workoutId)
-    .order("order_index", { ascending: true })
-    .overrideTypes<WorkoutExerciseQueryResult[]>();
-
-  if (error) {
-    throw new Error("Failed to fetch exercises from workout");
-  }
-
-  // Sort sets by set_number and return the result
-  return (
-    workoutExercises?.map((exercise) => ({
-      ...exercise,
-      sets: exercise.sets?.sort((a, b) => a.set_number - b.set_number) || [],
-    })) || []
-  );
-}
-// Function to get all exercises from the database
-export async function getAllExercises() {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
-
-  const { data: exercises, error } = await supabase
-    .from("exercises")
-    .select("id, name")
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw new Error("Failed to fetch exercises");
-  }
-
-  return exercises || [];
 }
 
 //____________________ HELPER FUNCTIONS ____________________
