@@ -73,6 +73,7 @@ export async function getWorkoutPlan(slug: string) {
     )
     .eq("slug", slug)
     .eq("user_id", user.data.user.id)
+    .order("order_index", { referencedTable: "workouts", ascending: true })
     .single();
 
   if (error || !workoutPlan) {

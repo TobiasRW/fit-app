@@ -1,6 +1,5 @@
 import AddWorkoutModal from "@/app/components/add-workout-modal";
 import { getWorkoutPlan } from "../actions";
-import Link from "next/link";
 import WorkoutCard from "@/app/components/workout-card";
 
 export default async function Page({
