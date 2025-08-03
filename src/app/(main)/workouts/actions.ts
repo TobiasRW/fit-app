@@ -291,6 +291,7 @@ export async function addWorkoutToPlan(
     revalidatePath(`/workouts/${planSlug}`);
     return { success: true };
   } catch (error) {
+    console.error("Unexpected error adding workout to plan:", error);
     return { error: "An unexpected error occurred. Please try again." };
   }
 }

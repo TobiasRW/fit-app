@@ -79,7 +79,10 @@ export default function AddWorkoutModal({ planId }: { planId: string }) {
                 />
 
                 <input type="hidden" name="planId" value={planId} />
-                <Button text="Create Workout" />
+                <Button
+                  text={`${pending ? "Creating..." : "Create Workout"}`}
+                  disabled={pending}
+                />
               </Form>
               {state?.error && (
                 <div className="mx-auto w-11/12 rounded border border-red-400 bg-red-100 p-3 text-red-700">
