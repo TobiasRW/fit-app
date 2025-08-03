@@ -348,6 +348,78 @@ export async function addExerciseToWorkout(
   }
 }
 
+//_____________________ UPDATE FUNCTIONS (PUT) _____________________
+
+//_________________________ DELETE FUNCTIONS (DELETE) _____________________
+
+// Function to delete an exercise from a workout
+export async function deleteExerciseFromWorkout(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+
+    if (!user.data.user) {
+      return { error: "User not authenticated" };
+    }
+
+    const workoutExerciseId = formData.get("workoutExerciseId") as string;
+    const planSlug = formData.get("planSlug") as string;
+    const workoutSlug = formData.get("workoutSlug") as string;
+
+    if (!workoutExerciseId) {
+      return { error: "Workout exercise ID is required" };
+    }
+
+    // Verify the user owns the workout exercise
+    const { data: workoutExercise, error: verifyError } = await supabase
+      .from("workout_exercises")
+      .select(
+        `
+        id,
+        workouts!inner (
+          slug,
+          workout_plans!inner (
+            slug,
+            user_id
+          )
+        )
+      `,
+      )
+      .eq("id", workoutExerciseId)
+      .eq("workouts.slug", workoutSlug)
+      .eq("workouts.workout_plans.slug", planSlug)
+      .eq("workouts.workout_plans.user_id", user.data.user.id)
+      .single();
+
+    if (verifyError || !workoutExercise) {
+      console.log("Verification failed:", verifyError);
+      return { error: "Workout exercise not found or user not authorized" };
+    }
+
+    // Delete the workout exercise (sets will be deleted automatically via CASCADE)
+    const { error: deleteError } = await supabase
+      .from("workout_exercises")
+      .delete()
+      .eq("id", workoutExerciseId);
+
+    if (deleteError) {
+      console.log("Delete error:", deleteError);
+      return { error: "Failed to delete exercise. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting exercise from workout:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
 //____________________ HELPER FUNCTIONS ____________________
 
 // generate slug

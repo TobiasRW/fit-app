@@ -17,7 +17,12 @@ export default async function Page({
       <div className="mt-4">
         <h2 className="text-2xl font-semibold">Exercises</h2>
         {exercises.map((exercise) => (
-          <ExerciseCard key={exercise.id} exercise={exercise} />
+          <ExerciseCard
+            key={exercise.id}
+            exercise={exercise}
+            planSlug={planSlug}
+            workoutSlug={workoutSlug}
+          />
         ))}
       </div>
 
