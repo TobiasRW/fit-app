@@ -188,7 +188,10 @@ export default function AddExerciseModal({
                   </div>
                 </div>
 
-                <Button text="Add Exercise" disabled={pending} />
+                <Button
+                  text={`${pending ? "Adding..." : "Add Exercise"}`}
+                  disabled={pending}
+                />
               </Form>
               {state?.error && (
                 <div className="mx-auto w-11/12 rounded border border-red-400 bg-red-100 p-3 text-red-700">
