@@ -73,7 +73,10 @@ export default function SignupPage() {
           placeholder="Confirm your password"
           required
         />
-        <Button text="Sign up" disabled={pending} />
+        <Button
+          text={`${pending ? "Signing up..." : "Sign up"}`}
+          disabled={pending}
+        />
       </Form>
 
       <p className="mt-4 text-center">

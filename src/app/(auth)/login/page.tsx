@@ -46,7 +46,10 @@ export default function LoginPage() {
           required
         />
 
-        <Button text="Log in" disabled={pending} />
+        <Button
+          text={`${pending ? "Logging in..." : "Log in"}`}
+          disabled={pending}
+        />
       </Form>
       <p className="mt-4 text-center">
         Don&apos;t have an account? <Link href="/signup">Sign up</Link>
