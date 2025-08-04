@@ -6,6 +6,8 @@ import {
 } from "../../actions";
 import ExerciseCard from "@/app/components/exercise-card";
 import EditNameModal from "@/app/components/edit-name-modal";
+import Link from "next/link";
+import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
 
 export default async function Page({
   params,
@@ -18,6 +20,9 @@ export default async function Page({
 
   return (
     <main className="mx-auto mt-10 w-11/12">
+      <Link href={`/workouts/${planSlug}`} className="my-2 flex items-center">
+        <CaretLeftIcon size={20} className="text-green" /> Back
+      </Link>
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-bold">{workout.name}</h1>
         <EditNameModal
