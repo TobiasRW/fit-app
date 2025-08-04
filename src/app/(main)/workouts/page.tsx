@@ -21,6 +21,7 @@ export default async function Page() {
                 name={plan.name}
                 planSlug={plan.slug}
                 variant="plan"
+                planId={plan.id}
               />
             ))}
           </div>

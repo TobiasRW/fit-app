@@ -554,6 +554,91 @@ export async function deleteExerciseFromWorkout(
   }
 }
 
+// Function to delete a workout
+export async function deleteWorkout(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+
+    if (!user.data.user) {
+      return { error: "User not authenticated" };
+    }
+
+    const workoutId = formData.get("workoutId") as string;
+    const planId = formData.get("planId") as string;
+    const planSlug = formData.get("planSlug") as string;
+
+    if (!workoutId) {
+      return { error: "Workout ID is required" };
+    }
+
+    // Use RPC function to delete workout and reorder remaining workouts
+    const { error: deleteError } = await supabase.rpc(
+      "delete_workout_and_reorder",
+      {
+        p_workout_id: workoutId,
+        p_plan_id: planId, // Use plan_id directly from workout
+      },
+    );
+
+    if (deleteError) {
+      console.log("Delete error:", deleteError);
+      return { error: "Failed to delete workout. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting workout:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+// Function to delete a workout plan
+export async function deleteWorkoutPlan(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+
+    if (!user.data.user) {
+      return { error: "User not authenticated" };
+    }
+
+    const planId = formData.get("planId") as string;
+
+    if (!planId) {
+      return { error: "Plan ID is required" };
+    }
+
+    // Direct delete - CASCADE will handle the rest
+    const { error: deleteError } = await supabase
+      .from("workout_plans")
+      .delete()
+      .eq("id", planId);
+
+    if (deleteError) {
+      console.log("Delete error:", deleteError);
+      return { error: "Failed to delete workout plan. Please try again." };
+    }
+
+    revalidatePath("/workouts");
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting workout plan:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
 //____________________ HELPER FUNCTIONS ____________________
 
 // generate slug

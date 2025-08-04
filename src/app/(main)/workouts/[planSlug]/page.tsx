@@ -39,6 +39,8 @@ export default async function Page({
                   planSlug={workoutPlan.slug}
                   workoutSlug={workout.slug}
                   variant="workout"
+                  planId={workoutPlan.id}
+                  workoutId={workout.id}
                 />
               ))}
             </div>
