@@ -1,6 +1,7 @@
 import AddWorkoutModal from "@/app/components/add-workout-modal";
-import { getWorkoutPlan } from "../actions";
+import { getWorkoutPlan, updateWorkoutPlan } from "../actions";
 import WorkoutCard from "@/app/components/workout-card";
+import EditNameModal from "@/app/components/edit-name-modal";
 
 export default async function Page({
   params,
@@ -12,7 +13,15 @@ export default async function Page({
 
   return (
     <main className="mx-auto mt-10 w-11/12">
-      <h1 className="text-4xl font-bold">{workoutPlan.name}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-4xl font-bold">{workoutPlan.name}</h1>
+        <EditNameModal
+          action={updateWorkoutPlan}
+          title="New Plan Name"
+          currentName={workoutPlan.name}
+          planId={workoutPlan.id}
+        />
+      </div>
 
       <div className="">
         {workoutPlan.workouts.length > 0 ? (

@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 // Define the initial state type
@@ -406,6 +406,78 @@ export async function updateExercise(
       error: "An unexpected error occurred. Please try again.",
     };
   }
+}
+
+// Function to update a workout plan's name
+export async function updateWorkoutPlan(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) {
+    return { error: "User not authenticated" };
+  }
+  const planId = formData.get("planId") as string;
+  const newName = formData.get("name") as string;
+
+  const slug = generateSlug(newName);
+  try {
+    // Update the workout plan's name
+    const { error: updateError } = await supabase
+      .from("workout_plans")
+      .update({ name: newName, slug })
+      .eq("id", planId)
+      .eq("user_id", user.data.user.id)
+      .single();
+
+    if (updateError) {
+      console.error("Update workout plan error:", updateError);
+      return { error: "Failed to update workout plan. Please try again." };
+    }
+  } catch (error) {
+    console.error("Unexpected error updating workout plan:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+  redirect(`/workouts/${slug}`);
+}
+
+// Function to update a workout's name
+export async function updateWorkoutName(
+  prevState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) {
+    return { error: "User not authenticated" };
+  }
+  const workoutId = formData.get("workoutId") as string;
+  const newName = formData.get("name") as string;
+  const planSlug = formData.get("planSlug") as string;
+  const slug = generateSlug(newName);
+
+  try {
+    // Update the workout's name
+    const { error: updateError } = await supabase
+      .from("workouts")
+      .update({ name: newName, slug })
+      .eq("id", workoutId)
+      .single();
+
+    if (updateError) {
+      console.error("Update workout error:", updateError);
+      return { error: "Failed to update workout. Please try again." };
+    }
+  } catch (error) {
+    console.error("Unexpected error updating workout:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+  redirect(`/workouts/${planSlug}/${slug}`);
 }
 
 //_________________________ DELETE FUNCTIONS (DELETE) _____________________
