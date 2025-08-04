@@ -129,7 +129,6 @@ export default function ExerciseCard({
         {isEditing && (
           <EditExerciseModal
             setIsEditing={setIsEditing}
-            isEditing={isEditing}
             exercise={exercise}
             planSlug={planSlug}
             workoutSlug={workoutSlug}
