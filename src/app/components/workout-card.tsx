@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { deleteWorkout, deleteWorkoutPlan } from "../(main)/workouts/actions";
 import Form from "next/form";
+import { InitialState } from "../types";
 
 type CardVariant = "plan" | "workout";
 
@@ -17,16 +18,6 @@ type WorkoutCardProps = {
   workoutSlug?: string;
   workoutId?: string;
   variant?: CardVariant;
-};
-
-type initialState = {
-  error?: string;
-  success?: boolean;
-};
-
-const initialState: initialState = {
-  error: undefined,
-  success: undefined,
 };
 
 export default function WorkoutCard({
@@ -100,12 +91,12 @@ export function DeleteModal({
   workoutId?: string;
   variant: CardVariant;
   action: (
-    prevState: initialState,
+    prevState: InitialState,
     formData: FormData,
-  ) => Promise<initialState>;
+  ) => Promise<InitialState>;
   setIsOpen: (isOpen: boolean) => void;
 }) {
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const [state, formAction, pending] = useActionState(action, {});
 
   return (
     <motion.div

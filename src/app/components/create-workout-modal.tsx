@@ -9,17 +9,9 @@ import Input from "./input";
 import Button from "./button";
 import { useActionState } from "react";
 
-const initialState = {
-  error: undefined,
-  success: undefined,
-};
-
 export default function CreateWorkoutModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    createWorkoutPlan,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(createWorkoutPlan, {});
 
   // Close the modal when the form is successfully submitted
   useEffect(() => {

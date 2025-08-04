@@ -7,34 +7,18 @@ import Form from "next/form";
 import Button from "./button";
 import { deleteExerciseFromWorkout } from "../(main)/workouts/actions";
 import EditExerciseModal from "./edit-exercise-modal";
-
-const initialState = {
-  error: undefined,
-  success: undefined,
-};
-
-export type WorkoutExercise = {
-  id: string;
-  order_index: number;
-  exercises: {
-    id: string;
-    name: string;
-  };
-  sets: {
-    id: string;
-    set_number: number;
-    target_reps: number;
-  }[];
-};
+import { WorkoutExercise } from "@/app/types";
 
 export default function ExerciseCard({
   exercise,
   planSlug,
   workoutSlug,
+  workoutId,
 }: {
   exercise: WorkoutExercise;
   planSlug: string;
   workoutSlug: string;
+  workoutId: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -121,6 +105,7 @@ export default function ExerciseCard({
             exerciseId={exercise.id}
             planSlug={planSlug}
             workoutSlug={workoutSlug}
+            workoutId={workoutId}
           />
         )}
       </AnimatePresence>
@@ -144,17 +129,19 @@ export function DeleteExerciseModal({
   exerciseId,
   planSlug,
   workoutSlug,
+  workoutId,
   setIsDeleting,
 }: {
   exercise: WorkoutExercise;
   exerciseId: string;
   planSlug: string;
   workoutSlug: string;
+  workoutId: string;
   setIsDeleting: (isDeleting: boolean) => void;
 }) {
   const [state, formAction, pending] = useActionState(
     deleteExerciseFromWorkout,
-    initialState,
+    {},
   );
 
   // Close modal on success
@@ -179,6 +166,7 @@ export function DeleteExerciseModal({
         <input type="hidden" name="workoutExerciseId" value={exerciseId} />
         <input type="hidden" name="planSlug" value={planSlug} />
         <input type="hidden" name="workoutSlug" value={workoutSlug} />
+        <input type="hidden" name="workoutId" value={workoutId} />
 
         <div className="mb-4 flex flex-col items-center justify-between text-center">
           <h2 className="text-2xl font-semibold">

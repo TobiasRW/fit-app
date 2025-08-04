@@ -6,27 +6,18 @@ import Input from "./input";
 import Form from "next/form";
 import { AnimatePresence, motion } from "motion/react";
 import { PencilIcon } from "@phosphor-icons/react";
-
-type initialState = {
-  error?: string;
-  success?: boolean;
-};
+import { InitialState } from "../types";
 
 type modalProps = {
   planSlug?: string;
   workoutId?: string;
   planId?: string;
   action: (
-    prevState: initialState,
+    prevState: InitialState,
     formData: FormData,
-  ) => Promise<initialState>;
+  ) => Promise<InitialState>;
   title: string;
   currentName: string;
-};
-
-const initialState: initialState = {
-  error: undefined,
-  success: undefined,
 };
 
 export default function EditNameModal({
@@ -38,7 +29,7 @@ export default function EditNameModal({
   currentName,
 }: modalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const [state, formAction, pending] = useActionState(action, {});
 
   return (
     <>

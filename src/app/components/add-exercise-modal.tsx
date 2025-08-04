@@ -11,11 +11,6 @@ import Input from "./input";
 import SearchDropdown from "./search-dropdown";
 import Button from "./button";
 
-const initialState = {
-  error: undefined,
-  success: undefined,
-};
-
 export default function AddExerciseModal({
   workoutId,
   planSlug,
@@ -26,10 +21,7 @@ export default function AddExerciseModal({
   workoutSlug: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    addExerciseToWorkout,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(addExerciseToWorkout, {});
 
   const [exercises, setExercises] = useState<{ id: string; name: string }[]>(
     [],

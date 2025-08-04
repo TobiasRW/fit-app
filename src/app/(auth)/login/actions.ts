@@ -4,15 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
-
-type initialState = {
-  error?: string;
-};
+import { InitialState } from "@/app/types";
 
 export async function login(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   const supabase = await createClient();
 
   // type-casting here for convenience

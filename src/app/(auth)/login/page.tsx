@@ -8,12 +8,8 @@ import Button from "@/app/components/button";
 import Link from "next/link";
 import { useActionState } from "react";
 
-const initialState = {
-  error: undefined,
-};
-
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(login, initialState);
+  const [state, formAction, pending] = useActionState(login, {});
   return (
     <main className="mx-auto w-11/12">
       <div className="mt-20 mb-10 flex flex-col items-center justify-center space-y-4">

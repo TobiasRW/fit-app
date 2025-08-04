@@ -6,12 +6,7 @@ import { XIcon } from "@phosphor-icons/react";
 import Form from "next/form";
 import Input from "./input";
 import Button from "./button";
-import { WorkoutExercise } from "./exercise-card";
-
-const initialState = {
-  error: undefined,
-  success: undefined,
-};
+import { WorkoutExercise } from "../types";
 
 export default function EditExerciseModal({
   exercise,
@@ -24,10 +19,7 @@ export default function EditExerciseModal({
   workoutSlug: string;
   setIsEditing: (isEditing: boolean) => void;
 }) {
-  const [state, formAction, pending] = useActionState(
-    updateExercise,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(updateExercise, {});
 
   // Initialize with existing sets data
   const [setReps, setSetReps] = useState<number[]>(

@@ -8,13 +8,8 @@ import Button from "@/app/components/button";
 import Link from "next/link";
 import { useActionState } from "react";
 
-const initialState = {
-  error: undefined,
-  success: undefined,
-};
-
 export default function SignupPage() {
-  const [state, formAction, pending] = useActionState(signup, initialState);
+  const [state, formAction, pending] = useActionState(signup, {});
   return (
     <main className="mx-auto w-11/12">
       <div className="mt-20 mb-10 flex flex-col items-center justify-center space-y-4">

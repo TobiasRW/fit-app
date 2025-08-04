@@ -9,17 +9,9 @@ import Button from "./button";
 import { useActionState } from "react";
 import { addWorkoutToPlan } from "../(main)/workouts/actions";
 
-const initialState = {
-  error: undefined,
-  success: undefined,
-};
-
 export default function AddWorkoutModal({ planId }: { planId: string }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    addWorkoutToPlan,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(addWorkoutToPlan, {});
 
   // Close the modal when the form is successfully submitted
   useEffect(() => {

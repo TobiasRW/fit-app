@@ -3,43 +3,17 @@
 import { createClient } from "@/utils/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-
-// Define the initial state type
-type initialState = {
-  error?: string;
-  success?: boolean;
-};
-
-// Define the type for the workout exercise query result
-type WorkoutExerciseQueryResult = {
-  id: string;
-  order_index: number;
-  exercises: {
-    id: string;
-    name: string;
-  };
-  sets: {
-    id: string;
-    set_number: number;
-    target_reps: number;
-  }[];
-};
+import { WorkoutExercise, InitialState } from "@/app/types";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
 
 // Function to get all the user's workout plans
 export async function getUserWorkoutPlans() {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
+  const { supabase } = await checkAuthentication();
 
   const { data: workoutPlans, error } = await supabase
     .from("workout_plans")
     .select("id, name, slug")
-    .eq("user_id", user.data.user.id)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -51,12 +25,7 @@ export async function getUserWorkoutPlans() {
 
 // Function to get a specific workout plan by slug
 export async function getWorkoutPlan(slug: string) {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
+  const { supabase } = await checkAuthentication();
 
   const { data: workoutPlan, error } = await supabase
     .from("workout_plans")
@@ -74,7 +43,6 @@ export async function getWorkoutPlan(slug: string) {
     `,
     )
     .eq("slug", slug)
-    .eq("user_id", user.data.user.id)
     .order("order_index", { referencedTable: "workouts", ascending: true })
     .single();
 
@@ -90,12 +58,7 @@ export async function getWorkoutFromPlan(
   planSlug: string,
   workoutSlug: string,
 ) {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
+  const { supabase } = await checkAuthentication();
 
   const { data: workout, error } = await supabase
     .from("workouts")
@@ -110,7 +73,6 @@ export async function getWorkoutFromPlan(
     )
     .eq("slug", workoutSlug)
     .eq("workout_plans.slug", planSlug)
-    .eq("workout_plans.user_id", user.data.user.id)
     .single();
 
   if (error || !workout) {
@@ -122,12 +84,7 @@ export async function getWorkoutFromPlan(
 
 // Function to get exercises from a workout
 export async function getExercisesFromWorkout(workoutId: string) {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
+  const { supabase } = await checkAuthentication();
 
   const { data: workoutExercises, error } = await supabase
     .from("workout_exercises")
@@ -148,7 +105,7 @@ export async function getExercisesFromWorkout(workoutId: string) {
     )
     .eq("workout_id", workoutId)
     .order("order_index", { ascending: true })
-    .overrideTypes<WorkoutExerciseQueryResult[]>();
+    .overrideTypes<WorkoutExercise[]>();
 
   if (error) {
     throw new Error("Failed to fetch exercises from workout");
@@ -164,12 +121,7 @@ export async function getExercisesFromWorkout(workoutId: string) {
 }
 // Function to get all exercises from the database
 export async function getAllExercises() {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
+  const { supabase } = await checkAuthentication();
 
   const { data: exercises, error } = await supabase
     .from("exercises")
@@ -187,19 +139,13 @@ export async function getAllExercises() {
 
 // Function to create a new workout plan for the user
 export async function createWorkoutPlan(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
+    const { supabase, user } = await checkAuthentication();
 
     const name = formData.get("name") as string;
-    const user = await supabase.auth.getUser();
-
-    // Validate user and name
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
 
     if (!name || name.trim() === "") {
       return { error: "Workout plan name is required" };
@@ -212,7 +158,7 @@ export async function createWorkoutPlan(
     const { error } = await supabase
       .from("workout_plans")
       .insert({
-        user_id: user.data.user.id,
+        user_id: user.id,
         name: name.trim(),
         slug: slug,
       })
@@ -244,16 +190,11 @@ export async function createWorkoutPlan(
 
 // Function to add a workout to a specific workout plan
 export async function addWorkoutToPlan(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
-
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
+    const { supabase } = await checkAuthentication();
 
     const planId = formData.get("planId") as string;
     const planSlug = formData.get("planSlug") as string;
@@ -266,17 +207,10 @@ export async function addWorkoutToPlan(
     const slug = generateSlug(workoutName);
 
     // Get current workout count for order_index
-    const { count } = await supabase
-      .from("workouts")
-      .select("*", { count: "exact", head: true })
-      .eq("plan_id", planId);
-
-    // Insert new workout
-    const { error } = await supabase.from("workouts").insert({
-      plan_id: planId,
-      name: workoutName,
-      slug: slug,
-      order_index: (count || 0) + 1,
+    const { error } = await supabase.rpc("add_workout_to_plan", {
+      p_plan_id: planId,
+      p_name: workoutName,
+      p_slug: slug,
     });
 
     if (error) {
@@ -298,16 +232,11 @@ export async function addWorkoutToPlan(
 
 // Function to add a exercise to a workout
 export async function addExerciseToWorkout(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
-
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
+    const { supabase } = await checkAuthentication();
 
     // get data from form
     const workoutId = formData.get("workoutId") as string;
@@ -320,22 +249,10 @@ export async function addExerciseToWorkout(
       .getAll("setReps")
       .map((rep) => parseInt(rep as string));
 
-    // Get current exercise count for order_index
-    const { data: maxOrderResult } = await supabase
-      .from("workout_exercises")
-      .select("order_index")
-      .eq("workout_id", workoutId)
-      .order("order_index", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    const nextOrderIndex = (maxOrderResult?.order_index || 0) + 1;
-
     // Use RPC function with the new order index
     const { error } = await supabase.rpc("add_exercise_with_sets", {
       p_workout_id: workoutId,
       p_exercise_id: exerciseId,
-      p_order_index: nextOrderIndex,
       p_set_reps: setReps,
     });
 
@@ -357,16 +274,11 @@ export async function addExerciseToWorkout(
 
 // Functions to update a workout plan's exercise
 export async function updateExercise(
-  initialState: initialState,
+  InitialState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
-
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
+    const { supabase } = await checkAuthentication();
 
     const workoutExerciseId = formData.get("workoutExerciseId") as string;
     const planSlug = formData.get("planSlug") as string;
@@ -410,14 +322,10 @@ export async function updateExercise(
 
 // Function to update a workout plan's name
 export async function updateWorkoutPlan(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-  if (!user.data.user) {
-    return { error: "User not authenticated" };
-  }
+): Promise<InitialState> {
+  const { supabase } = await checkAuthentication();
   const planId = formData.get("planId") as string;
   const newName = formData.get("name") as string;
 
@@ -428,7 +336,6 @@ export async function updateWorkoutPlan(
       .from("workout_plans")
       .update({ name: newName, slug })
       .eq("id", planId)
-      .eq("user_id", user.data.user.id)
       .single();
 
     if (updateError) {
@@ -446,14 +353,10 @@ export async function updateWorkoutPlan(
 
 // Function to update a workout's name
 export async function updateWorkoutName(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-  if (!user.data.user) {
-    return { error: "User not authenticated" };
-  }
+): Promise<InitialState> {
+  const { supabase } = await checkAuthentication();
   const workoutId = formData.get("workoutId") as string;
   const newName = formData.get("name") as string;
   const planSlug = formData.get("planSlug") as string;
@@ -484,18 +387,14 @@ export async function updateWorkoutName(
 
 // Function to delete an exercise from a workout
 export async function deleteExerciseFromWorkout(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
-
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
+    const { supabase } = await checkAuthentication();
 
     const workoutExerciseId = formData.get("workoutExerciseId") as string;
+    const workoutId = formData.get("workoutId") as string;
     const planSlug = formData.get("planSlug") as string;
     const workoutSlug = formData.get("workoutSlug") as string;
 
@@ -503,39 +402,12 @@ export async function deleteExerciseFromWorkout(
       return { error: "Workout exercise ID is required" };
     }
 
-    // Verify the user owns the workout exercise
-    const { data: workoutExercise, error: verifyError } = await supabase
-      .from("workout_exercises")
-      .select(
-        `
-        id,
-        workout_id,
-        workouts!inner (
-          slug,
-          workout_plans!inner (
-            slug,
-            user_id
-          )
-        )
-      `,
-      )
-      .eq("id", workoutExerciseId)
-      .eq("workouts.slug", workoutSlug)
-      .eq("workouts.workout_plans.slug", planSlug)
-      .eq("workouts.workout_plans.user_id", user.data.user.id)
-      .single();
-
-    if (verifyError || !workoutExercise) {
-      console.log("Verification failed:", verifyError);
-      return { error: "Workout exercise not found or user not authorized" };
-    }
-
     // Delete the workout exercise and reorder (sets will be deleted automatically via CASCADE)
     const { error: deleteError } = await supabase.rpc(
       "delete_exercise_and_reorder",
       {
         p_workout_exercise_id: workoutExerciseId,
-        p_workout_id: workoutExercise.workout_id,
+        p_workout_id: workoutId,
       },
     );
 
@@ -556,16 +428,11 @@ export async function deleteExerciseFromWorkout(
 
 // Function to delete a workout
 export async function deleteWorkout(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
-
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
+    const { supabase } = await checkAuthentication();
 
     const workoutId = formData.get("workoutId") as string;
     const planId = formData.get("planId") as string;
@@ -601,17 +468,11 @@ export async function deleteWorkout(
 
 // Function to delete a workout plan
 export async function deleteWorkoutPlan(
-  prevState: initialState,
+  prevState: InitialState,
   formData: FormData,
-): Promise<initialState> {
+): Promise<InitialState> {
   try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
-
-    if (!user.data.user) {
-      return { error: "User not authenticated" };
-    }
-
+    const { supabase } = await checkAuthentication();
     const planId = formData.get("planId") as string;
 
     if (!planId) {
@@ -647,4 +508,16 @@ function generateSlug(name: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+// Authentication check
+export async function checkAuthentication() {
+  const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!user.data.user) {
+    throw new Error("User not authenticated");
+  }
+
+  return { supabase, user: user.data.user };
 }
