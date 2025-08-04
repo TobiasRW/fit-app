@@ -6,13 +6,14 @@ import { CaretDownIcon } from "@phosphor-icons/react";
 import Form from "next/form";
 import Button from "./button";
 import { deleteExerciseFromWorkout } from "../(main)/workouts/actions";
+import EditExerciseModal from "./edit-exercise-modal";
 
 const initialState = {
   error: undefined,
   success: undefined,
 };
 
-type WorkoutExercise = {
+export type WorkoutExercise = {
   id: string;
   order_index: number;
   exercises: {
@@ -38,6 +39,7 @@ export default function ExerciseCard({
   const [isOpen, setIsOpen] = useState(false);
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   return (
     <>
@@ -99,7 +101,12 @@ export default function ExerciseCard({
                     disabled={isDeleting}
                     onClick={() => setIsDeleting(true)}
                   />
-                  <Button text="Edit" size="small" type="button" />
+                  <Button
+                    text="Edit"
+                    size="small"
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                  />
                 </div>
               </div>
             </motion.div>
@@ -112,6 +119,18 @@ export default function ExerciseCard({
             setIsDeleting={setIsDeleting}
             exercise={exercise}
             exerciseId={exercise.id}
+            planSlug={planSlug}
+            workoutSlug={workoutSlug}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isEditing && (
+          <EditExerciseModal
+            setIsEditing={setIsEditing}
+            isEditing={isEditing}
+            exercise={exercise}
             planSlug={planSlug}
             workoutSlug={workoutSlug}
           />

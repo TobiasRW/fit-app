@@ -321,16 +321,21 @@ export async function addExerciseToWorkout(
       .map((rep) => parseInt(rep as string));
 
     // Get current exercise count for order_index
-    const { count } = await supabase
+    const { data: maxOrderResult } = await supabase
       .from("workout_exercises")
-      .select("*", { count: "exact", head: true })
-      .eq("workout_id", workoutId);
+      .select("order_index")
+      .eq("workout_id", workoutId)
+      .order("order_index", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    // Use RPC function
+    const nextOrderIndex = (maxOrderResult?.order_index || 0) + 1;
+
+    // Use RPC function with the new order index
     const { error } = await supabase.rpc("add_exercise_with_sets", {
       p_workout_id: workoutId,
       p_exercise_id: exerciseId,
-      p_order_index: (count || 0) + 1,
+      p_order_index: nextOrderIndex,
       p_set_reps: setReps,
     });
 
@@ -349,6 +354,59 @@ export async function addExerciseToWorkout(
 }
 
 //_____________________ UPDATE FUNCTIONS (PUT) _____________________
+
+// Functions to update a workout plan's exercise
+export async function updateExercise(
+  initialState: initialState,
+  formData: FormData,
+): Promise<initialState> {
+  try {
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+
+    if (!user.data.user) {
+      return { error: "User not authenticated" };
+    }
+
+    const workoutExerciseId = formData.get("workoutExerciseId") as string;
+    const planSlug = formData.get("planSlug") as string;
+    const workoutSlug = formData.get("workoutSlug") as string;
+
+    if (!workoutExerciseId) {
+      return { error: "Workout exercise ID is required" };
+    }
+
+    // Get all the setReps values as an array
+    const setReps = formData
+      .getAll("setReps")
+      .map((rep) => parseInt(rep as string))
+      .filter((rep) => !isNaN(rep) && rep > 0);
+
+    if (setReps.length === 0) {
+      return { error: "At least one valid set is required" };
+    }
+
+    // Use RPC function to update exercise sets
+    // RLS will ensure user can only update their own exercises
+    const { error: updateError } = await supabase.rpc("update_exercise_sets", {
+      p_workout_exercise_id: workoutExerciseId,
+      p_set_reps: setReps,
+    });
+
+    if (updateError) {
+      console.error("Update exercise error:", updateError);
+      return { error: "Failed to update exercise. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error updating exercise:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
 
 //_________________________ DELETE FUNCTIONS (DELETE) _____________________
 
@@ -379,6 +437,7 @@ export async function deleteExerciseFromWorkout(
       .select(
         `
         id,
+        workout_id,
         workouts!inner (
           slug,
           workout_plans!inner (
@@ -399,11 +458,14 @@ export async function deleteExerciseFromWorkout(
       return { error: "Workout exercise not found or user not authorized" };
     }
 
-    // Delete the workout exercise (sets will be deleted automatically via CASCADE)
-    const { error: deleteError } = await supabase
-      .from("workout_exercises")
-      .delete()
-      .eq("id", workoutExerciseId);
+    // Delete the workout exercise and reorder (sets will be deleted automatically via CASCADE)
+    const { error: deleteError } = await supabase.rpc(
+      "delete_exercise_and_reorder",
+      {
+        p_workout_exercise_id: workoutExerciseId,
+        p_workout_id: workoutExercise.workout_id,
+      },
+    );
 
     if (deleteError) {
       console.log("Delete error:", deleteError);

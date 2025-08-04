@@ -32,7 +32,7 @@ export default function Button({
     <button
       type={type}
       className={`${variants[variant]} ${sizes[size]} ${
-        disabled ? "opacity-50" : ""
+        disabled ? "opacity-80" : ""
       }`}
       disabled={disabled}
       onClick={onClick}
