@@ -18,3 +18,13 @@ export type WorkoutExercise = {
     target_reps: number;
   }[];
 };
+
+// Type for a upcoming workout
+export type UpcomingWorkout = {
+  id: string;
+  workoutName: string;
+  workoutSlug: string;
+  planName: string;
+  planSlug: string;
+  progress: string;
+} | null;

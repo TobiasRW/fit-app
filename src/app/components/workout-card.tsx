@@ -14,26 +14,30 @@ import {
 import Form from "next/form";
 import { InitialState } from "../types";
 
-type CardVariant = "plan" | "workout";
+type CardVariant = "plan" | "workout" | "upcoming";
 
 type WorkoutCardProps = {
   name: string;
+  secondName?: string;
   planSlug?: string;
   planId?: string;
   workoutSlug?: string;
   workoutId?: string;
   variant?: CardVariant;
   isActive?: boolean;
+  progress?: string;
 };
 
 export default function WorkoutCard({
   name,
+  secondName,
   planSlug,
   planId,
   workoutSlug,
   workoutId,
   variant = "workout",
   isActive,
+  progress,
 }: WorkoutCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Separate hooks for each action
@@ -59,15 +63,24 @@ export default function WorkoutCard({
           href={
             variant === "plan"
               ? `/workouts/${planSlug}`
-              : `/workouts/${planSlug}/${workoutSlug}`
+              : variant === "workout"
+                ? `/workouts/${planSlug}/${workoutSlug}`
+                : `/session/${workoutSlug}`
           }
           className="absolute inset-0 z-30"
         ></Link>
 
         {/* Text positioned in center of entire card */}
-        <div className="absolute inset-0 z-20 flex items-center px-4">
+        <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">
           <h2 className="text-xl font-bold">{name}</h2>
         </div>
+        {secondName && variant === "upcoming" && (
+          <div className="pl-2">
+            <p className="text-foreground/50 text-sm">
+              {secondName} | workout {progress}
+            </p>
+          </div>
+        )}
 
         {/* Background Image */}
         <Image
@@ -76,7 +89,7 @@ export default function WorkoutCard({
           fill
           className="w-full scale-110 rounded-md object-cover"
         />
-        {variant === "plan" ? (
+        {variant === "plan" && (
           <div className="relative z-30 flex items-center justify-between">
             <Form action={currentAction} className="">
               <input type="hidden" name="planId" value={planId} />
@@ -95,7 +108,8 @@ export default function WorkoutCard({
               onClick={() => setIsOpen(true)}
             />
           </div>
-        ) : (
+        )}
+        {variant === "workout" && (
           <div className="relative z-30 flex justify-end">
             <Button
               variant="destructive"
