@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 // generate slug
-export async function generateSlug(name: string): Promise<string> {
+export function generateSlug(name: string): string {
   return name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
