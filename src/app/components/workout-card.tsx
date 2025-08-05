@@ -36,57 +36,80 @@ export default function WorkoutCard({
   isActive,
 }: WorkoutCardProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    isActive === true ? deactivatePlan : setActivePlan,
+  // Separate hooks for each action
+  const [activateState, activateAction, activatePending] = useActionState(
+    setActivePlan,
+    {},
+  );
+  const [deactivateState, deactivateAction, deactivatePending] = useActionState(
+    deactivatePlan,
     {},
   );
 
+  // Choose which state/action to use based on current status
+  const currentState = isActive ? deactivateState : activateState;
+  const currentAction = isActive ? deactivateAction : activateAction;
+  const currentPending = isActive ? deactivatePending : activatePending;
+
   return (
     <>
-      <div>
-        <div className="bg-gray relative flex h-26 cursor-pointer items-center overflow-hidden rounded-lg px-2 drop-shadow-md">
-          <div className="z-10 mx-auto w-11/12">
-            <h2 className="text-xl font-bold">{name}</h2>
-            {variant === "plan" && (
-              <Form action={formAction} className="absolute bottom-2 left-2">
-                <input type="hidden" name="planId" value={planId} />
-                <Button
-                  type="submit"
-                  variant={isActive === true ? "primary" : "basic"}
-                  text={isActive === true ? "Active" : "Inactive"}
-                  size="extrasmall"
-                  disabled={pending}
-                />
-              </Form>
-            )}
-          </div>
-          <div className="z-10 flex flex-col gap-4">
-            <Link
-              href={
-                variant === "plan"
-                  ? `/workouts/${planSlug}`
-                  : `/workouts/${planSlug}/${workoutSlug}`
-              }
-            >
-              <Button variant="primary" text="Edit" size="small" />
-            </Link>
+      <div className="bg-gray flex h-28 flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
+        {/* Make entire card clickable */}
+        <Link
+          href={
+            variant === "plan"
+              ? `/workouts/${planSlug}`
+              : `/workouts/${planSlug}/${workoutSlug}`
+          }
+          className="absolute inset-0 z-30"
+        ></Link>
+
+        {/* Text positioned in center of entire card */}
+        <div className="absolute inset-0 z-20 flex items-center px-4">
+          <h2 className="text-xl font-bold">{name}</h2>
+        </div>
+
+        {/* Background Image */}
+        <Image
+          src="/dumbell-banner-light.svg"
+          alt="Workout Plan"
+          fill
+          className="w-full scale-110 rounded-md object-cover"
+        />
+        {variant === "plan" ? (
+          <div className="relative z-30 flex items-center justify-between">
+            <Form action={currentAction} className="">
+              <input type="hidden" name="planId" value={planId} />
+              <Button
+                type="submit"
+                variant={isActive === true ? "primary" : "secondary"}
+                text={isActive === true ? "Active" : "Inactive"}
+                size="extrasmall"
+                disabled={currentPending}
+              />
+            </Form>
             <Button
               variant="destructive"
               text="Delete"
-              size="small"
+              size="extrasmall"
               onClick={() => setIsOpen(true)}
             />
           </div>
-          <Image
-            src="/dumbell-banner-light.svg"
-            alt="Workout Plan"
-            fill
-            className="w-full scale-110 rounded-md object-cover"
-          />
-        </div>
+        ) : (
+          <div className="relative z-30 flex justify-end">
+            <Button
+              variant="destructive"
+              text="Delete"
+              size="extrasmall"
+              onClick={() => setIsOpen(true)}
+            />
+          </div>
+        )}
       </div>
-      {state?.error && (
-        <div className="mt-2 text-center text-red-500">{state.error}</div>
+      {currentState?.error && (
+        <div className="mt-2 text-center text-red-500">
+          {currentState.error}
+        </div>
       )}
       <AnimatePresence>
         {isOpen && (
