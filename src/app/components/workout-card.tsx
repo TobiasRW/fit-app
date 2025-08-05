@@ -5,7 +5,12 @@ import Image from "next/image";
 import Button from "./button";
 import { useActionState, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { deleteWorkout, deleteWorkoutPlan } from "../(main)/workouts/actions";
+import {
+  deleteWorkout,
+  deleteWorkoutPlan,
+  setActivePlan,
+  deactivatePlan,
+} from "../(main)/workouts/actions";
 import Form from "next/form";
 import { InitialState } from "../types";
 
@@ -18,6 +23,7 @@ type WorkoutCardProps = {
   workoutSlug?: string;
   workoutId?: string;
   variant?: CardVariant;
+  isActive?: boolean;
 };
 
 export default function WorkoutCard({
@@ -27,15 +33,32 @@ export default function WorkoutCard({
   workoutSlug,
   workoutId,
   variant = "workout",
+  isActive,
 }: WorkoutCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [state, formAction, pending] = useActionState(
+    isActive === true ? deactivatePlan : setActivePlan,
+    {},
+  );
 
   return (
     <>
       <div>
-        <div className="bg-gray flex h-26 cursor-pointer items-center overflow-hidden rounded-lg px-2 drop-shadow-md">
-          <div className="mx-auto w-11/12">
+        <div className="bg-gray relative flex h-26 cursor-pointer items-center overflow-hidden rounded-lg px-2 drop-shadow-md">
+          <div className="z-10 mx-auto w-11/12">
             <h2 className="text-xl font-bold">{name}</h2>
+            {variant === "plan" && (
+              <Form action={formAction} className="absolute bottom-2 left-2">
+                <input type="hidden" name="planId" value={planId} />
+                <Button
+                  type="submit"
+                  variant={isActive === true ? "primary" : "basic"}
+                  text={isActive === true ? "Active" : "Inactive"}
+                  size="extrasmall"
+                  disabled={pending}
+                />
+              </Form>
+            )}
           </div>
           <div className="z-10 flex flex-col gap-4">
             <Link
@@ -62,6 +85,9 @@ export default function WorkoutCard({
           />
         </div>
       </div>
+      {state?.error && (
+        <div className="mt-2 text-center text-red-500">{state.error}</div>
+      )}
       <AnimatePresence>
         {isOpen && (
           <DeleteModal

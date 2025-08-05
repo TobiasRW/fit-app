@@ -22,6 +22,7 @@ export default async function Page() {
                 planSlug={plan.slug}
                 variant="plan"
                 planId={plan.id}
+                isActive={plan.is_active}
               />
             ))}
           </div>

@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { WorkoutExercise, InitialState } from "@/app/types";
+import { checkAuthentication, generateSlug } from "@/utils/helpers/helpers";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
 
@@ -13,7 +13,7 @@ export async function getUserWorkoutPlans() {
 
   const { data: workoutPlans, error } = await supabase
     .from("workout_plans")
-    .select("id, name, slug")
+    .select("id, name, slug, is_active")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -383,6 +383,76 @@ export async function updateWorkoutName(
   redirect(`/workouts/${planSlug}/${slug}`);
 }
 
+// Function to set an active workout plan
+export async function setActivePlan(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  try {
+    const { supabase, user } = await checkAuthentication();
+
+    const planId = formData.get("planId") as string;
+
+    if (!planId) {
+      return { error: "Plan ID is required" };
+    }
+
+    // Use RPC to atomically set one plan as active and others as inactive
+    const { error } = await supabase.rpc("set_active_plan", {
+      p_user_id: user.id,
+      p_plan_id: planId,
+    });
+
+    if (error) {
+      console.error("Set active plan error:", error);
+      return { error: "Failed to set active plan. Please try again." };
+    }
+
+    revalidatePath("/workouts");
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error setting active plan:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+// Function to deactivate a workout plan
+export async function deactivatePlan(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  try {
+    const { supabase, user } = await checkAuthentication();
+    const planId = formData.get("planId") as string;
+
+    if (!planId) {
+      return { error: "Plan ID is required" };
+    }
+
+    // Update the plan to set is_active to false
+    const { error } = await supabase
+      .from("workout_plans")
+      .update({ is_active: false })
+      .eq("id", planId)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("Deactivate workout plan error:", error);
+      return { error: "Failed to deactivate workout plan. Please try again." };
+    }
+
+    revalidatePath("/workouts");
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deactivating workout plan:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
 //_________________________ DELETE FUNCTIONS (DELETE) _____________________
 
 // Function to delete an exercise from a workout
@@ -498,26 +568,4 @@ export async function deleteWorkoutPlan(
       error: "An unexpected error occurred. Please try again.",
     };
   }
-}
-
-//____________________ HELPER FUNCTIONS ____________________
-
-// generate slug
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-// Authentication check
-export async function checkAuthentication() {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!user.data.user) {
-    throw new Error("User not authenticated");
-  }
-
-  return { supabase, user: user.data.user };
 }
