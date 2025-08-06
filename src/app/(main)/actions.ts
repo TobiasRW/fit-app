@@ -10,8 +10,12 @@ export async function getNextWorkout(): Promise<UpcomingWorkout> {
     user_uuid: user.id,
   });
 
-  if (error || !data || data.length === 0) {
+  if (!data || data.length === 0) {
     return null;
+  }
+
+  if (error) {
+    return { error: "Failed to load your next workout" };
   }
 
   const workout = data[0];

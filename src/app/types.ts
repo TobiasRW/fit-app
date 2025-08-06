@@ -20,11 +20,14 @@ export type WorkoutExercise = {
 };
 
 // Type for a upcoming workout
-export type UpcomingWorkout = {
-  id: string;
-  workoutName: string;
-  workoutSlug: string;
-  planName: string;
-  planSlug: string;
-  progress: string;
-} | null;
+export type UpcomingWorkout =
+  | {
+      id: string;
+      workoutName: string;
+      workoutSlug: string;
+      planName: string;
+      planSlug: string;
+      progress: string;
+    }
+  | null
+  | { error: string };

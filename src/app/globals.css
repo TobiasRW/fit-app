@@ -7,6 +7,7 @@
   --faded-green: #a8e5be;
   --gray: #ebebeb;
   --red: #f24545;
+  --faded-red: #f57a7a;
   --font-plein: "Plein", sans-serif;
   --font-archivo: "Archivo", sans-serif;
 }
@@ -31,6 +32,7 @@
   --color-faded-green: var(--faded-green);
   --color-gray: var(--gray);
   --color-red: var(--red);
+  --color-faded-red: var(--faded-red);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-plein);
