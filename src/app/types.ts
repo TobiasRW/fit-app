@@ -4,14 +4,16 @@ export type InitialState = {
   success?: boolean | string;
 };
 
-// Type for a workout exercise
+//_________________ WORKOUT TYPES ________________________
+
 export type WorkoutExercise = {
   id: string;
   order_index: number;
-  exercises: {
+  exercises: Array<{
     id: string;
     name: string;
-  };
+    slug?: string;
+  }>;
   sets: {
     id: string;
     set_number: number;
@@ -19,7 +21,6 @@ export type WorkoutExercise = {
   }[];
 };
 
-// Type for a upcoming workout
 export type UpcomingWorkout =
   | {
       id: string;
@@ -33,7 +34,6 @@ export type UpcomingWorkout =
   | null
   | { error: string };
 
-// Types for detailed workout session
 export type Exercise = {
   id: string;
   name: string;
@@ -48,8 +48,8 @@ export type WorkoutSet = {
   id: string;
   set_number: number;
   target_reps: number;
-  lastReps?: number; // Optional - from last performance
-  lastWeight?: number; // Optional - from last performance
+  lastReps?: number;
+  lastWeight?: number;
 };
 
 export type CompletedSet = {
@@ -88,5 +88,16 @@ export type CurrentWorkout = {
   completed: boolean;
 };
 
-// Type for user goal
-export type UserGoal = { goal: number } | { error: string };
+export type CompletedWorkout = {
+  id: string;
+  user_id: string;
+  workout_id: string;
+  completed_at: string;
+  completed_date: string;
+  workouts: Array<{
+    name: string;
+    slug: string;
+    id: string;
+    workout_exercises: WorkoutExercise[];
+  }>;
+};

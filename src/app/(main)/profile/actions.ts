@@ -1,12 +1,12 @@
 "use server";
-import { InitialState, UserGoal } from "@/app/types";
+import { InitialState } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 // Function to get the users goal
-export async function getUserGoal(): Promise<UserGoal> {
+export async function getUserGoal() {
   try {
     const { supabase, user } = await checkAuthentication();
 

@@ -1,5 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
-import { getNextWorkout } from "./actions";
+import {
+  getNextWorkout,
+  getUserWeekStreak,
+  getWeeklyCompletedWorkouts,
+} from "./actions";
 import WorkoutCard from "../components/workout-card";
 import ErrorCard from "../components/error-card";
 import { getISOWeek } from "date-fns";
@@ -42,6 +46,10 @@ export default async function Home() {
           </div>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
         </div>
+        <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
+          <WorkoutStats />
+          <WeekStreak />
+        </div>
       </section>
     </main>
   );
@@ -50,7 +58,6 @@ export default async function Home() {
 // Component to fetch and display the next workout
 async function WorkoutSection() {
   const nextWorkout = await getNextWorkout();
-  console.log("Next Workout:", nextWorkout);
 
   if (!nextWorkout) {
     return (
@@ -61,7 +68,7 @@ async function WorkoutSection() {
   }
 
   if ("error" in nextWorkout) {
-    return <ErrorCard errorText={nextWorkout.error} />;
+    return <ErrorCard errorText={nextWorkout.error} variant="primary" />;
   }
 
   return (
@@ -93,6 +100,42 @@ function WorkoutSkeleton() {
       <div className="relative z-20 pl-2">
         <div className="bg-background/40 h-4 w-1/2 rounded-lg"></div>
       </div>
+    </div>
+  );
+}
+
+// Stats Section
+async function WorkoutStats() {
+  const thisWeeksWorkouts = await getWeeklyCompletedWorkouts();
+  const streak = await getUserWeekStreak();
+
+  if ("error" in thisWeeksWorkouts) {
+    return (
+      <div className="h-32 w-2/4">
+        <ErrorCard errorText={thisWeeksWorkouts.error} variant="secondary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="">
+      <p className="text-foreground text-center text-7xl font-medium">
+        {thisWeeksWorkouts.length}/{streak.goal}
+      </p>
+      <p className="text-foreground text-sm font-light">Workouts this week</p>
+    </div>
+  );
+}
+
+async function WeekStreak() {
+  const streak = await getUserWeekStreak();
+
+  return (
+    <div className="">
+      <p className="text-foreground text-center text-7xl font-medium">🔥</p>
+      <p className="text-foreground text-sm font-light">
+        <span className="text-base font-bold">{streak.streak} </span>Week Streak
+      </p>
     </div>
   );
 }
