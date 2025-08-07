@@ -37,10 +37,6 @@ export default async function Page() {
 export async function GoalSection() {
   const goal = await getUserGoal();
 
-  if (!goal) {
-    return <p className="text-foreground/50">No goal set.</p>;
-  }
-
   if ("error" in goal) {
     return (
       <p className="text-center text-red-500">
@@ -57,7 +53,7 @@ export async function GoalSection() {
       </div>
       <div className="mt-4 flex items-center justify-center">
         <div className="mt-4 flex items-center justify-center">
-          <EditGoalModal goal={"goal" in goal ? goal.goal : undefined} />
+          <EditGoalModal goal={goal.goal} />
         </div>
       </div>
     </div>

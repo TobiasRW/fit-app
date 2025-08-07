@@ -21,7 +21,7 @@ export async function getUserGoal(): Promise<UserGoal> {
     }
 
     if (!data) {
-      return { error: "No goal found for user" };
+      return { error: "No goal set." };
     }
 
     return { goal: data.workout_goal_per_week };
