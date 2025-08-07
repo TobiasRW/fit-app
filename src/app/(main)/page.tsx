@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getNextWorkout } from "./actions";
 import WorkoutCard from "../components/workout-card";
 import ErrorCard from "../components/error-card";
-
+import { getISOWeek } from "date-fns";
 import { Suspense } from "react";
 
 export default async function Home() {
@@ -10,6 +10,8 @@ export default async function Home() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const currentWeekNumber = getISOWeek(new Date());
 
   return (
     <main className="mx-auto mt-10 w-11/12">
@@ -23,10 +25,23 @@ export default async function Home() {
       </section>
 
       <section className="relative mt-10 space-y-4">
-        <h2 className="text-2xl font-medium">Next Workout</h2>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-medium">Next Workout</h2>
+          <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
+        </div>
         <Suspense fallback={<WorkoutSkeleton />}>
           <WorkoutSection />
         </Suspense>
+      </section>
+
+      <section className="relative mt-10 space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-medium">Weekly Stats</h2>
+            <p>{`Week ${currentWeekNumber}`}</p>
+          </div>
+          <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
+        </div>
       </section>
     </main>
   );
