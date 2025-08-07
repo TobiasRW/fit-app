@@ -87,3 +87,6 @@ export type CurrentWorkout = {
   lastCompletedAt: string | null;
   completed: boolean;
 };
+
+// Type for user goal
+export type UserGoal = { goal: number } | { error: string };
