@@ -1,7 +1,8 @@
 import Avatar from "@/app/components/avatar";
 import { createClient } from "@/utils/supabase/server";
-import { getUserGoal } from "./actions";
+import { getUserGoal, signOut } from "./actions";
 import EditGoalModal from "@/app/components/modals/edit-goal-modal";
+import Button from "@/app/components/ui/button";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -25,6 +26,9 @@ export default async function Page() {
             <GoalSection />
           </div>
         </section>
+        <div className="fixed bottom-30 left-1/2 mt-10 flex w-full -translate-x-1/2 items-center justify-center">
+          <Button text="Sign Out" onClick={signOut} variant="secondary" />
+        </div>
       </main>
     </>
   );
