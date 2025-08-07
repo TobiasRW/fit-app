@@ -31,6 +31,7 @@ export default function CurrentExerciseCard({
       setIsSuccess(true);
       const timer = setTimeout(() => {
         setIsSuccess(false);
+        setIsOpen(false);
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -42,7 +43,7 @@ export default function CurrentExerciseCard({
         <div className="flex h-full items-center justify-between p-4">
           <div className="flex items-center justify-center gap-4">
             <h3 className="text-lg font-semibold">{exercise.exercise.name}</h3>
-            {isCompleted && (
+            {isCompleted && !workoutCompleted && (
               <div className="flex items-center gap-2">
                 <span className="rounded-full bg-green-500 px-2 py-1 text-xs text-white">
                   ✓ Saved
