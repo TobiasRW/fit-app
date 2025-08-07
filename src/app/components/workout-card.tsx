@@ -26,6 +26,7 @@ type WorkoutCardProps = {
   variant?: CardVariant;
   isActive?: boolean;
   progress?: string;
+  completed?: boolean;
 };
 
 export default function WorkoutCard({
@@ -38,6 +39,7 @@ export default function WorkoutCard({
   variant = "workout",
   isActive,
   progress,
+  completed = false,
 }: WorkoutCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Separate hooks for each action
@@ -70,7 +72,6 @@ export default function WorkoutCard({
           className="absolute inset-0 z-30"
         ></Link>
 
-        {/* Text positioned in center of entire card */}
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">
           <h2 className="text-xl font-bold">{name}</h2>
         </div>
@@ -79,6 +80,14 @@ export default function WorkoutCard({
             <p className="text-foreground/50 text-sm">
               {secondName} | workout {progress}
             </p>
+          </div>
+        )}
+
+        {completed === true && variant === "upcoming" && (
+          <div className="absolute top-2 right-2 z-20">
+            <span className="rounded-full bg-green-500 px-2 py-1 text-xs text-white">
+              ✓ Completed
+            </span>
           </div>
         )}
 
