@@ -6,9 +6,9 @@ import { AnimatePresence, motion } from "motion/react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import { saveCompletedExercise } from "../(main)/session/[workoutSlug]/actions";
 import Form from "next/form";
-import Input from "./input";
-import Textarea from "./textarea";
-import Button from "./button";
+import Input from "./ui/input";
+import Textarea from "./ui/textarea";
+import Button from "./ui/button";
 
 export default function CurrentExerciseCard({
   exercise,

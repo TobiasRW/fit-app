@@ -1,4 +1,4 @@
-import CreateWorkoutModal from "@/app/components/create-workout-modal";
+import CreateWorkoutModal from "@/app/components/modals/create-workout-modal";
 import WorkoutCard from "../../components/workout-card";
 import { getUserWorkoutPlans } from "./actions";
 

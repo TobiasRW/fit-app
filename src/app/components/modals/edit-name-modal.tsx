@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useActionState } from "react";
-import Button from "./button";
-import Input from "./input";
+import Button from "../ui/button";
+import Input from "../ui/input";
 import Form from "next/form";
 import { AnimatePresence, motion } from "motion/react";
 import { PencilIcon } from "@phosphor-icons/react";
-import { InitialState } from "../types";
+import { InitialState } from "../../types";
 
 type modalProps = {
   planSlug?: string;

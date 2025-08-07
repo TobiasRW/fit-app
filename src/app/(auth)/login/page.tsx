@@ -3,8 +3,8 @@
 import { login } from "./actions";
 import { BarbellIcon } from "@phosphor-icons/react/ssr";
 import Form from "next/form";
-import Input from "@/app/components/input";
-import Button from "@/app/components/button";
+import Input from "@/app/components/ui/input";
+import Button from "@/app/components/ui/button";
 import Link from "next/link";
 import { useActionState } from "react";
 

@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   addExerciseToWorkout,
   getAllExercises,
-} from "../(main)/workouts/actions";
+} from "../../(main)/workouts/actions";
 import { useActionState, useEffect, useState } from "react";
 import { PlusIcon, XIcon } from "@phosphor-icons/react";
 import Form from "next/form";
-import Input from "./input";
-import SearchDropdown from "./search-dropdown";
-import Button from "./button";
+import Input from "../ui/input";
+import SearchDropdown from "../ui/search-dropdown";
+import Button from "../ui/button";
 
 export default function AddExerciseModal({
   workoutId,

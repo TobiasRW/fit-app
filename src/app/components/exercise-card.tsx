@@ -4,9 +4,9 @@ import { useState, useActionState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import Form from "next/form";
-import Button from "./button";
+import Button from "./ui/button";
 import { deleteExerciseFromWorkout } from "../(main)/workouts/actions";
-import EditExerciseModal from "./edit-exercise-modal";
+import EditExerciseModal from "./modals/edit-exercise-modal";
 import { WorkoutExercise } from "@/app/types";
 
 export default function ExerciseCard({

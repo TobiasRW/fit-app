@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import Button from "./button";
+import Button from "./ui/button";
 import { useActionState, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {

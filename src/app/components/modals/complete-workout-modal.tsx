@@ -1,10 +1,10 @@
 "use client";
 import { useActionState, useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { saveCompletedWorkout } from "../(main)/session/[workoutSlug]/actions";
-import Button from "./button";
+import { saveCompletedWorkout } from "../../(main)/session/[workoutSlug]/actions";
+import Button from "../ui/button";
 import Form from "next/form";
-import { CurrentWorkout } from "../types";
+import { CurrentWorkout } from "../../types";
 
 export default function CompleteWorkoutModal({
   workout,

@@ -1,11 +1,11 @@
-import AddExerciseModal from "@/app/components/add-exercise-modal";
+import AddExerciseModal from "@/app/components/modals/add-exercise-modal";
 import {
   getWorkoutFromPlan,
   getExercisesFromWorkout,
   updateWorkoutName,
 } from "../../actions";
 import ExerciseCard from "@/app/components/exercise-card";
-import EditNameModal from "@/app/components/edit-name-modal";
+import EditNameModal from "@/app/components/modals/edit-name-modal";
 import Link from "next/link";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
 

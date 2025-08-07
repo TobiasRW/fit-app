@@ -1,7 +1,7 @@
-import AddWorkoutModal from "@/app/components/add-workout-modal";
+import AddWorkoutModal from "@/app/components/modals/add-workout-modal";
 import { getWorkoutPlan, updateWorkoutPlan } from "../actions";
 import WorkoutCard from "@/app/components/workout-card";
-import EditNameModal from "@/app/components/edit-name-modal";
+import EditNameModal from "@/app/components/modals/edit-name-modal";
 import Link from "next/link";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
 

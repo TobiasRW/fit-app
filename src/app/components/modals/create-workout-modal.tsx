@@ -4,14 +4,14 @@ import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState } from "react";
 import { PlusIcon, XIcon } from "@phosphor-icons/react";
 import Form from "next/form";
-import Input from "./input";
-import Button from "./button";
+import { createWorkoutPlan } from "../../(main)/workouts/actions";
+import Input from "../ui/input";
+import Button from "../ui/button";
 import { useActionState } from "react";
-import { addWorkoutToPlan } from "../(main)/workouts/actions";
 
-export default function AddWorkoutModal({ planId }: { planId: string }) {
+export default function CreateWorkoutModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(addWorkoutToPlan, {});
+  const [state, formAction, pending] = useActionState(createWorkoutPlan, {});
 
   // Close the modal when the form is successfully submitted
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function AddWorkoutModal({ planId }: { planId: string }) {
               className="fixed right-0 bottom-0 left-0 h-5/6 space-y-4 rounded-t-2xl bg-white pt-4 shadow-lg"
             >
               <div className="mx-auto flex w-11/12 items-center justify-between">
-                <h2 className="text-2xl font-semibold">New workout</h2>
+                <h2 className="text-2xl font-semibold">New workout plan</h2>
                 <XIcon
                   size={26}
                   className="text-foreground"
@@ -63,18 +63,13 @@ export default function AddWorkoutModal({ planId }: { planId: string }) {
               >
                 <Input
                   type="text"
-                  id="workoutName"
-                  name="workoutName"
-                  label="Workout name"
+                  id="name"
+                  name="name"
+                  label="Workout Plan Name"
                   required
-                  placeholder="Enter workout name"
+                  placeholder="Enter workout plan name"
                 />
-
-                <input type="hidden" name="planId" value={planId} />
-                <Button
-                  text={`${pending ? "Creating..." : "Create Workout"}`}
-                  disabled={pending}
-                />
+                <Button text="Create Workout Plan" disabled={pending} />
               </Form>
               {state?.error && (
                 <div className="mx-auto w-11/12 rounded border border-red-400 bg-red-100 p-3 text-red-700">

@@ -1,6 +1,6 @@
 import CurrentExerciseCard from "@/app/components/current-exercise-card";
 import { getCurrentWorkout } from "./actions";
-import CompleteWorkoutModal from "@/app/components/complete-workout-modal";
+import CompleteWorkoutModal from "@/app/components/modals/complete-workout-modal";
 
 export default async function Page({
   params,

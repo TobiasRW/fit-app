@@ -1,12 +1,12 @@
 "use client";
 import { motion } from "motion/react";
-import { updateExercise } from "../(main)/workouts/actions";
+import { updateExercise } from "../../(main)/workouts/actions";
 import { useActionState, useEffect, useState } from "react";
 import { XIcon } from "@phosphor-icons/react";
 import Form from "next/form";
-import Input from "./input";
-import Button from "./button";
-import { WorkoutExercise } from "../types";
+import Input from "../ui/input";
+import Button from "../ui/button";
+import { WorkoutExercise } from "../../types";
 
 export default function EditExerciseModal({
   exercise,
