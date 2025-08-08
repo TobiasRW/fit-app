@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getUserGoal, signOut } from "./actions";
 import EditGoalModal from "@/app/components/modals/edit-goal-modal";
 import Button from "@/app/components/ui/button";
+import { Suspense } from "react";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -23,7 +24,9 @@ export default async function Page() {
             <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
           </div>
           <div>
-            <GoalSection />
+            <Suspense fallback={<LoadingGoal />}>
+              <GoalSection />
+            </Suspense>
           </div>
         </section>
         <div className="fixed bottom-30 left-1/2 mt-10 flex w-full -translate-x-1/2 items-center justify-center">
@@ -56,6 +59,15 @@ async function GoalSection() {
           <EditGoalModal goal={goal.workout_goal_per_week} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function LoadingGoal() {
+  return (
+    <div className="flex flex-col items-center justify-center space-y-4">
+      <div className="bg-gray h-14 w-14 animate-pulse rounded-lg"></div>
+      <div className="h-4 w-32 animate-pulse rounded-lg bg-gray-200"></div>
     </div>
   );
 }
