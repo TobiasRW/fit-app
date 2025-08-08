@@ -1,7 +1,7 @@
 "use client";
 import { AnimatePresence, motion } from "motion/react";
 import { CaretDownIcon } from "@phosphor-icons/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CompletedWorkout } from "../types";
 
 export default function CompletedExerciseCard({

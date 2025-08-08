@@ -10,6 +10,7 @@ import { getISOWeek } from "date-fns";
 import { Suspense } from "react";
 import { CompletedWorkout, Streak } from "../types";
 import CompletedExerciseCard from "../components/complete-exercise-card";
+import Link from "next/link";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -61,9 +62,17 @@ async function WorkoutSection() {
 
   if (!nextWorkout) {
     return (
-      <p className="text-foreground/50 mt-4">
-        No upcoming workouts found. Please create a workout plan.
-      </p>
+      <div className="bg-gray flex h-28 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+        <p className="text-foreground text-center">
+          Please create or activate a workout plan.
+        </p>
+        <Link
+          href="/workouts"
+          className="bg-background text-foreground mx-auto mt-2 inline-block w-2/4 rounded-full px-2 py-1 text-center"
+        >
+          Go to Workouts
+        </Link>
+      </div>
     );
   }
 
@@ -145,7 +154,11 @@ async function StatsSection() {
             ))}
           </div>
         ) : (
-          <p>No workouts completed this week.</p>
+          <div className="bg-gray flex h-14 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+            <p className="text-foreground text-center">
+              No workouts completed this week.
+            </p>
+          </div>
         )}
       </div>
     </div>
