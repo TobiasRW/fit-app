@@ -46,7 +46,7 @@ export default async function Page() {
         <section className="mt-10">
           <h3 className="mb-2 text-xl font-medium">Your PR&#39;s</h3>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
-          <div className="justify-betwee mt-4 flex items-center gap-4">
+          <div className="mt-4 flex items-center justify-between gap-4">
             {prDefinitions.map((def) => (
               <Suspense key={def.name} fallback={<LoadingPR />}>
                 <PRCard name={def.name} fetch={def.fetch} />
