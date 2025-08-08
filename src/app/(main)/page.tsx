@@ -8,6 +8,8 @@ import WorkoutCard from "../components/workout-card";
 import ErrorCard from "../components/error-card";
 import { getISOWeek } from "date-fns";
 import { Suspense } from "react";
+import { CompletedWorkout, Streak } from "../types";
+import CompletedExerciseCard from "../components/complete-exercise-card";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -18,7 +20,7 @@ export default async function Home() {
   const currentWeekNumber = getISOWeek(new Date());
 
   return (
-    <main className="mx-auto mt-10 w-11/12">
+    <main className="mx-auto mt-10 w-11/12 pb-20">
       <section className="">
         <h1 className="text-4xl font-bold">
           Hey,{" "}
@@ -46,10 +48,8 @@ export default async function Home() {
           </div>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
         </div>
-        <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
-          <WorkoutStats />
-          <WeekStreak />
-        </div>
+
+        <StatsSection />
       </section>
     </main>
   );
@@ -105,36 +105,79 @@ function WorkoutSkeleton() {
 }
 
 // Stats Section
-async function WorkoutStats() {
+async function StatsSection() {
   const thisWeeksWorkouts = await getWeeklyCompletedWorkouts();
   const streak = await getUserWeekStreak();
 
+  console.log(thisWeeksWorkouts);
+
   if ("error" in thisWeeksWorkouts) {
     return (
-      <div className="h-32 w-2/4">
+      <div className="h-40 w-full">
         <ErrorCard errorText={thisWeeksWorkouts.error} variant="secondary" />
+      </div>
+    );
+  }
+
+  if ("error" in streak) {
+    return (
+      <div className="h-40 w-full">
+        <ErrorCard
+          errorText={streak.error ?? "An unknown error occurred."}
+          variant="secondary"
+        />
       </div>
     );
   }
 
   return (
     <div className="">
+      <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
+        <WorkoutStats workouts={thisWeeksWorkouts} streak={streak} />
+        <WeekStreak streak={streak} />
+      </div>
+      <div className="mt-10">
+        <h3 className="mb-4 text-xl">This weeks completed workouts:</h3>
+        {thisWeeksWorkouts.length > 0 ? (
+          <div className="space-y-4">
+            {thisWeeksWorkouts.map((workout) => (
+              <CompletedExerciseCard key={workout.id} exercise={workout} />
+            ))}
+          </div>
+        ) : (
+          <p>No workouts completed this week.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+async function WorkoutStats({
+  workouts,
+  streak,
+}: {
+  workouts?: CompletedWorkout[];
+  streak?: Streak;
+}) {
+  return (
+    <div className="">
       <p className="text-foreground text-center text-7xl font-medium">
-        {thisWeeksWorkouts.length}/{streak.goal}
+        {workouts?.length}/{streak?.goal}
       </p>
       <p className="text-foreground text-sm font-light">Workouts this week</p>
     </div>
   );
 }
 
-async function WeekStreak() {
-  const streak = await getUserWeekStreak();
-
+async function WeekStreak({ streak }: { streak?: Streak }) {
   return (
     <div className="">
-      <p className="text-foreground text-center text-7xl font-medium">🔥</p>
+      <p className="text-foreground text-center text-7xl font-medium">
+        {streak?.streak && streak.streak > 0 ? "🔥" : "❄️"}
+      </p>
       <p className="text-foreground text-sm font-light">
-        <span className="text-base font-bold">{streak.streak} </span>Week Streak
+        <span className="text-base font-bold">{streak?.streak} </span>Week
+        Streak
       </p>
     </div>
   );

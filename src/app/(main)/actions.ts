@@ -1,7 +1,7 @@
 "use server";
 
 import { checkAuthentication } from "@/utils/helpers/helpers";
-import { CompletedWorkout, UpcomingWorkout } from "../types";
+import { CompletedWorkout, Streak, UpcomingWorkout } from "../types";
 import { startOfWeek, endOfWeek, getISOWeek, getYear } from "date-fns";
 
 export async function getNextWorkout(): Promise<UpcomingWorkout> {
@@ -38,7 +38,6 @@ export async function getWeeklyCompletedWorkouts(): Promise<
 > {
   const { supabase, user } = await checkAuthentication();
 
-  // Get start (Monday) and end (Sunday) of current week
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
   const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
 
@@ -54,49 +53,61 @@ export async function getWeeklyCompletedWorkouts(): Promise<
       workouts (
         name,
         slug,
+        id
+      ),
+      completed_exercises (
         id,
-        workout_exercises (
+        exercise_id,
+        notes,
+        saved_at,
+        exercises (
           id,
-          exercise_id,
-          order_index,
-          exercises (
-            id,
-            name,
-            slug
-          ),
-          sets (
-          id, 
+          name,
+          slug
+        ),
+        completed_sets (
+          id,
           set_number,
-          target_reps
-          )
+          reps,
+          weight
         )
       )
     `,
     )
     .eq("user_id", user.id)
     .gte("completed_at", weekStart)
-    .lte("completed_at", weekEnd);
+    .lte("completed_at", weekEnd)
+    .order("completed_at", { ascending: true })
+    .order("saved_at", {
+      referencedTable: "completed_exercises",
+      ascending: true,
+    });
 
   if (error) {
     console.error("Error fetching weekly completed workouts:", error);
-    return { error: "Failed to get completed workouts" };
+    return { error: "Failed to load completed workouts for this week" };
   }
 
-  return data;
+  return data as unknown as CompletedWorkout[];
 }
 
 // Function to get the users week streak based on their completed workouts goal
-export async function getUserWeekStreak() {
+export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
   const { supabase, user } = await checkAuthentication();
 
   // Get user's weekly goal
-  const { data: settings } = await supabase
+  const { data: settings, error: settingsError } = await supabase
     .from("user_settings")
     .select("workout_goal_per_week")
     .eq("id", user.id)
     .single();
 
-  const goal = settings?.workout_goal_per_week || 1;
+  if (settingsError) {
+    console.error("Error fetching user settings:", settingsError);
+    return { error: "Failed to load your goal" };
+  }
+
+  const goal = settings?.workout_goal_per_week;
 
   // Fetch all completed workouts for the user
   const { data, error } = await supabase
@@ -106,7 +117,7 @@ export async function getUserWeekStreak() {
 
   if (error) {
     console.error("Error fetching completed workouts:", error);
-    return { error: "Failed to fetch completed workouts" };
+    return { error: "Failed to load completed workouts for this week" };
   }
 
   // Group workouts by ISO week and year

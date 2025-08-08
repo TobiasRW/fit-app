@@ -9,11 +9,11 @@ export type InitialState = {
 export type WorkoutExercise = {
   id: string;
   order_index: number;
-  exercises: Array<{
+  exercises: {
     id: string;
     name: string;
     slug?: string;
-  }>;
+  };
   sets: {
     id: string;
     set_number: number;
@@ -52,11 +52,11 @@ export type WorkoutSet = {
   lastWeight?: number;
 };
 
-export type CompletedSet = {
-  set_number: number;
-  reps: number;
-  weight: number;
-};
+// export type CompletedSet = {
+//   set_number: number;
+//   reps: number;
+//   weight: number;
+// };
 
 export type LastPerformance = {
   notes: string | null;
@@ -88,16 +88,43 @@ export type CurrentWorkout = {
   completed: boolean;
 };
 
+// Create a specific type for the workout exercises in completed workouts
+export type CompletedSet = {
+  id: string;
+  set_number: number;
+  reps: number;
+  weight: number;
+};
+
+export type CompletedExercise = {
+  id: string;
+  exercise_id: string;
+  notes: string | null;
+  saved_at: string;
+  exercises: {
+    id: string;
+    name: string;
+    slug: string;
+  };
+  completed_sets: CompletedSet[];
+};
+
 export type CompletedWorkout = {
   id: string;
   user_id: string;
   workout_id: string;
   completed_at: string;
   completed_date: string;
-  workouts: Array<{
+  workouts: {
+    id: string;
     name: string;
     slug: string;
-    id: string;
-    workout_exercises: WorkoutExercise[];
-  }>;
+  };
+  completed_exercises: CompletedExercise[];
+};
+
+export type Streak = {
+  error?: string | undefined;
+  streak?: number | undefined;
+  goal?: number | undefined;
 };

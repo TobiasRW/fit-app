@@ -24,7 +24,7 @@ export async function getUserGoal() {
       return { error: "No goal set." };
     }
 
-    return { goal: data.workout_goal_per_week };
+    return data;
   } catch (err) {
     console.error("Error fetching user goal:", err);
     return { error: "An unexpected error occurred" };

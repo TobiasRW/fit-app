@@ -48,12 +48,12 @@ export async function GoalSection() {
   return (
     <div className="">
       <div className="flex flex-col items-center justify-center">
-        <p className="text-6xl">{goal.goal}</p>
+        <p className="text-6xl">{goal.workout_goal_per_week}</p>
         <p className="text-foreground font-light">Workouts per week</p>
       </div>
       <div className="mt-4 flex items-center justify-center">
         <div className="mt-4 flex items-center justify-center">
-          <EditGoalModal goal={goal.goal} />
+          <EditGoalModal goal={goal.workout_goal_per_week} />
         </div>
       </div>
     </div>
