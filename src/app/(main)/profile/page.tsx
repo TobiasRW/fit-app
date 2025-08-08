@@ -15,7 +15,7 @@ export default async function Page() {
     <>
       <main className="mx-auto mt-10 w-11/12">
         <h1 className="text-4xl font-bold">Your Profile</h1>
-        <section className="mt-20 flex flex-col items-center justify-center">
+        <section className="mt-10 flex flex-col items-center justify-center">
           <Avatar user={user!} />
         </section>
         <section className="mt-10 space-y-4">
@@ -29,7 +29,7 @@ export default async function Page() {
             </Suspense>
           </div>
         </section>
-        <div className="fixed bottom-30 left-1/2 mt-10 flex w-full -translate-x-1/2 items-center justify-center">
+        <div className="mt-10 flex w-full items-center justify-center">
           <Button text="Sign Out" onClick={signOut} variant="secondary" />
         </div>
       </main>
