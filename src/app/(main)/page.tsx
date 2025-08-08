@@ -118,8 +118,6 @@ async function StatsSection() {
   const thisWeeksWorkouts = await getWeeklyCompletedWorkouts();
   const streak = await getUserWeekStreak();
 
-  console.log(thisWeeksWorkouts);
-
   if ("error" in thisWeeksWorkouts) {
     return (
       <div className="h-40 w-full">

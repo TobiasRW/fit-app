@@ -2,7 +2,13 @@
 
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { CompletedWorkout, Streak, UpcomingWorkout } from "../types";
-import { startOfWeek, endOfWeek, getISOWeek, getYear } from "date-fns";
+import {
+  startOfWeek,
+  endOfWeek,
+  getISOWeek,
+  getYear,
+  startOfISOWeek,
+} from "date-fns";
 
 export async function getNextWorkout(): Promise<UpcomingWorkout> {
   const { supabase, user } = await checkAuthentication();
@@ -95,7 +101,7 @@ export async function getWeeklyCompletedWorkouts(): Promise<
 export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
   const { supabase, user } = await checkAuthentication();
 
-  // Get user's weekly goal
+  // 1. Get goal
   const { data: settings, error: settingsError } = await supabase
     .from("user_settings")
     .select("workout_goal_per_week")
@@ -106,10 +112,9 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
     console.error("Error fetching user settings:", settingsError);
     return { error: "Failed to load your goal" };
   }
+  const goal = settings?.workout_goal_per_week || 0;
 
-  const goal = settings?.workout_goal_per_week;
-
-  // Fetch all completed workouts for the user
+  // 2. Get all completed workouts
   const { data, error } = await supabase
     .from("completed_workouts")
     .select("completed_at")
@@ -117,10 +122,10 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
 
   if (error) {
     console.error("Error fetching completed workouts:", error);
-    return { error: "Failed to load completed workouts for this week" };
+    return { error: "Failed to load completed workouts" };
   }
 
-  // Group workouts by ISO week and year
+  // 3. Count per ISO week
   const weekCounts: Record<string, number> = {};
   for (const workout of data) {
     const date = new Date(workout.completed_at);
@@ -130,19 +135,19 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
     weekCounts[key] = (weekCounts[key] || 0) + 1;
   }
 
-  // Sort weeks descending (most recent first)
-  const sortedWeeks = Object.keys(weekCounts).sort((a, b) => {
-    const [yearA, weekA] = a.split("-").map(Number);
-    const [yearB, weekB] = b.split("-").map(Number);
-    if (yearA !== yearB) return yearB - yearA;
-    return weekB - weekA;
-  });
-
-  // Calculate streak
+  // 4. Start from current week, walk backward
   let streak = 0;
-  for (const key of sortedWeeks) {
-    if (weekCounts[key] >= goal) {
+  const datePointer = startOfISOWeek(new Date());
+
+  while (true) {
+    const week = getISOWeek(datePointer);
+    const year = getYear(datePointer);
+    const key = `${year}-${week}`;
+
+    if ((weekCounts[key] || 0) >= goal) {
       streak++;
+      // move back a week
+      datePointer.setDate(datePointer.getDate() - 7);
     } else {
       break;
     }
