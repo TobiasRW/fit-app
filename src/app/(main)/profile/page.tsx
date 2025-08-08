@@ -66,8 +66,8 @@ async function GoalSection() {
 function LoadingGoal() {
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <div className="bg-gray h-14 w-14 animate-pulse rounded-lg"></div>
-      <div className="h-4 w-32 animate-pulse rounded-lg bg-gray-200"></div>
+      <div className="bg-gray dark:bg-dark-gray h-14 w-14 animate-pulse rounded-lg"></div>
+      <div className="bg-gray dark:bg-dark-gray h-4 w-32 animate-pulse rounded-lg"></div>
     </div>
   );
 }

@@ -19,7 +19,7 @@ export default function Button({
     primary: disabled
       ? "bg-faded-green text-background rounded-full"
       : "bg-green text-background rounded-full",
-    secondary: "bg-gray text-foreground rounded-full",
+    secondary: "bg-gray text-foreground rounded-full dark:bg-dark-gray",
     destructive: "bg-red text-background rounded-full",
     basic: "bg-background text-foreground rounded-full",
   };
