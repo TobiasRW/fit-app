@@ -34,7 +34,7 @@ export default async function Page() {
   );
 }
 
-export async function GoalSection() {
+async function GoalSection() {
   const goal = await getUserGoal();
 
   if ("error" in goal) {
