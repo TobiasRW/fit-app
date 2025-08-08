@@ -21,7 +21,7 @@ export default function CompletedExerciseCard({
 
   return (
     <>
-      <div className="bg-gray gap-2 rounded-lg shadow-md">
+      <div className="bg-gray dark:bg-dark-gray gap-2 rounded-lg shadow-md">
         <div className="flex w-full items-center justify-between px-2 py-3">
           <div className="flex gap-2">
             <p className="font-medium">{formatDate(exercise.completed_date)}</p>
@@ -46,7 +46,7 @@ export default function CompletedExerciseCard({
               {exercise.completed_exercises.map((ex) => (
                 <div
                   key={ex.id}
-                  className="bg-background border-foreground flex flex-col border-b p-2 last:border-0"
+                  className="bg-background dark:bg-off-black border-foreground flex flex-col border-b p-2 last:border-0"
                 >
                   <p className="mb-2 text-lg">{ex.exercises.name}</p>
 

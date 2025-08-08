@@ -13,7 +13,7 @@ export default function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed right-0 bottom-0 left-0 z-50 flex items-center justify-between bg-white px-6 py-4">
+    <nav className="fixed right-0 bottom-0 left-0 z-50 flex items-center justify-between bg-white px-6 py-4 dark:bg-black">
       <Link
         href="/"
         className={`flex flex-col items-center ${

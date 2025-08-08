@@ -6,6 +6,8 @@
   --green: #1db954;
   --faded-green: #a8e5be;
   --gray: #ebebeb;
+  --dark-gray: #2c2c2c;
+  --off-black: #1a1a1a;
   --red: #f24545;
   --faded-red: #f57a7a;
   --font-plein: "Plein", sans-serif;
@@ -31,6 +33,8 @@
   --color-green: var(--green);
   --color-faded-green: var(--faded-green);
   --color-gray: var(--gray);
+  --color-dark-gray: var(--dark-gray);
+  --color-off-black: var(--off-black);
   --color-red: var(--red);
   --color-faded-red: var(--faded-red);
   --font-sans: var(--font-geist-sans);

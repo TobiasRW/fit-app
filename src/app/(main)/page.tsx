@@ -64,13 +64,13 @@ async function WorkoutSection() {
 
   if (!nextWorkout) {
     return (
-      <div className="bg-gray flex h-28 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+      <div className="bg-gray dark:bg-dark-gray flex h-28 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
         <p className="text-foreground text-center">
           Please create or activate a workout plan.
         </p>
         <Link
           href="/workouts"
-          className="bg-background text-foreground mx-auto mt-2 inline-block w-2/4 rounded-full px-2 py-1 text-center"
+          className="bg-background dark:bg-green text-foreground mx-auto mt-2 inline-block w-2/4 rounded-full px-2 py-1 text-center"
         >
           Go to Workouts
         </Link>
@@ -101,8 +101,8 @@ async function WorkoutSection() {
 // Loading component for the workout section
 function WorkoutSkeleton() {
   return (
-    <div className="bg-gray relative flex h-28 animate-pulse flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
-      <div className="bg-gray absolute inset-0 rounded-lg"></div>
+    <div className="bg-gray dark:bg-dark-gray relative flex h-28 animate-pulse flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
+      <div className="bg-gray dark:bg-dark-gray absolute inset-0 rounded-lg"></div>
 
       <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">
         <div className="bg-background/40 mb-1 h-6 w-3/4 rounded-lg"></div>
@@ -154,7 +154,7 @@ async function StatsSection() {
             ))}
           </div>
         ) : (
-          <div className="bg-gray flex h-14 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+          <div className="bg-gray dark:bg-dark-gray flex h-14 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
             <p className="text-foreground text-center">
               No workouts completed this week.
             </p>
@@ -201,28 +201,28 @@ function LoadingStatsSection() {
     <div className="">
       <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
         {/* WorkoutStats skeleton */}
-        <div className="bg-gray flex animate-pulse flex-col items-center justify-center rounded-lg p-4">
-          <div className="bg-gray mb-2 h-12 w-24 animate-pulse rounded-lg"></div>
-          <div className="bg-gray h-4 w-20 animate-pulse rounded-lg"></div>
+        <div className="bg-gray dark:bg-dark-gray flex animate-pulse flex-col items-center justify-center rounded-lg p-4">
+          <div className="bg-gray dark:bg-dark-gray mb-2 h-12 w-24 animate-pulse rounded-lg"></div>
+          <div className="bg-gray dark:bg-dark-gray h-4 w-20 animate-pulse rounded-lg"></div>
         </div>
         {/* WeekStreak skeleton */}
-        <div className="bg-gray flex animate-pulse flex-col items-center justify-center rounded-lg p-4">
-          <div className="bg-gray mb-2 h-12 w-16 animate-pulse rounded-lg"></div>
-          <div className="bg-gray h-4 w-20 animate-pulse rounded-lg"></div>
+        <div className="bg-gray dark:bg-dark-gray flex animate-pulse flex-col items-center justify-center rounded-lg p-4">
+          <div className="bg-gray dark:bg-dark-gray mb-2 h-12 w-16 animate-pulse rounded-lg"></div>
+          <div className="bg-gray dark:bg-dark-gray h-4 w-20 animate-pulse rounded-lg"></div>
         </div>
       </div>
       <div className="mt-10">
-        <h3 className="bg-gray mb-4 h-6 w-1/2 animate-pulse rounded"></h3>
+        <h3 className="bg-gray dark:bg-dark-gray mb-4 h-6 w-1/2 animate-pulse rounded"></h3>
         {/* Simulate loading for workout cards or fallback */}
         <div className="space-y-4">
-          <div className="bg-gray flex h-14 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-            <div className="bg-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
+          <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+            <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
           </div>
-          <div className="bg-gray flex h-14 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-            <div className="bg-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
+          <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+            <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
           </div>
-          <div className="bg-gray flex h-14 flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-            <div className="bg-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
+          <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
+            <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
           </div>
         </div>
       </div>
