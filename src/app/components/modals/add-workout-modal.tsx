@@ -46,7 +46,7 @@ export default function AddWorkoutModal({ planId }: { planId: string }) {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed right-0 bottom-0 left-0 h-5/6 space-y-4 rounded-t-2xl bg-white pt-4 shadow-lg"
+              className="dark:bg-off-black fixed right-0 bottom-0 left-0 z-50 h-5/6 space-y-4 rounded-t-2xl bg-white pt-4 shadow-lg"
             >
               <div className="mx-auto flex w-11/12 items-center justify-between">
                 <h2 className="text-2xl font-semibold">New workout</h2>

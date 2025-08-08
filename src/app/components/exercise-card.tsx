@@ -27,7 +27,7 @@ export default function ExerciseCard({
 
   return (
     <>
-      <div className="bg-gray my-4 rounded-lg drop-shadow-md">
+      <div className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md">
         <div className="flex items-center justify-between p-4">
           <div className="flex flex-col">
             <h3 className="text-xl font-semibold">
@@ -44,7 +44,7 @@ export default function ExerciseCard({
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className="bg-background mt-1 overflow-hidden rounded-b-lg"
+              className="bg-background mt-1 overflow-hidden rounded-b-lg dark:bg-[#3d3d3d]"
               initial={{ height: 0 }}
               animate={{ height: "auto" }}
               exit={{ height: 0 }}
@@ -53,11 +53,13 @@ export default function ExerciseCard({
               <div className="flex w-full">
                 <table className="w-4/6">
                   <thead>
-                    <tr className="border-foreground bg-green text-background border-r border-b">
-                      <th className="border-foreground w-4/10 border-r px-4 py-2 text-left">
+                    <tr className="border-foreground bg-green dark:bg-dark-green text-background border-r border-b">
+                      <th className="border-foreground dark:text-foreground w-4/10 border-r px-4 py-2 text-left">
                         Sets
                       </th>
-                      <th className="w-6/10 px-4 py-2 text-left">Reps</th>
+                      <th className="dark:text-foreground w-6/10 px-4 py-2 text-left">
+                        Reps
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -66,10 +68,10 @@ export default function ExerciseCard({
                         key={set.id}
                         className="border-foreground border-b last:border-b-0"
                       >
-                        <td className="border-foreground bg-faded-green border-r px-4 py-2">
+                        <td className="border-foreground bg-faded-green dark:text-background border-r px-4 py-2">
                           Set {set.set_number}
                         </td>
-                        <td className="bg-background w-full border-r px-4 py-2">
+                        <td className="bg-background w-full border-r px-4 py-2 dark:bg-[#3d3d3d]">
                           {set.target_reps} reps
                         </td>
                       </tr>

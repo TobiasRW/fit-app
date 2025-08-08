@@ -39,7 +39,7 @@ export default function CurrentExerciseCard({
 
   return (
     <>
-      <div className="bg-gray my-4 rounded-lg drop-shadow-md">
+      <div className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md">
         <div className="flex h-full items-center justify-between p-4">
           <div className="flex items-center justify-center gap-4">
             <h3 className="text-lg font-semibold">{exercise.exercise.name}</h3>
@@ -67,7 +67,7 @@ export default function CurrentExerciseCard({
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className="bg-background overflow-hidden rounded-b-lg"
+              className="bg-background overflow-hidden rounded-b-lg dark:bg-[#3d3d3d]"
               initial={{ height: 0 }}
               animate={{ height: "auto" }}
               exit={{ height: 0 }}
@@ -95,14 +95,14 @@ export default function CurrentExerciseCard({
                 <div className="flex w-full">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-foreground bg-green text-background border-b">
-                        <th className="border-foreground w-2/6 border-r px-4 py-2 text-center">
+                      <tr className="border-foreground bg-green dark:bg-dark-green text-background border-b">
+                        <th className="border-foreground dark:text-foreground w-2/6 border-r px-4 py-2 text-center">
                           Sets
                         </th>
-                        <th className="border-foreground w-2/6 border-r px-4 py-2 text-center">
+                        <th className="border-foreground dark:text-foreground w-2/6 border-r px-4 py-2 text-center">
                           Reps
                         </th>
-                        <th className="border-foreground w-2/6 px-4 py-2 text-center">
+                        <th className="border-foreground dark:text-foreground w-2/6 px-4 py-2 text-center">
                           Weight
                         </th>
                       </tr>
@@ -114,8 +114,10 @@ export default function CurrentExerciseCard({
                           className="border-foreground border-b last:border-b-0"
                         >
                           <td className="border-foreground bg-faded-green flex items-center gap-4 border-r px-4 py-2">
-                            <p className="">{set.set_number}</p>
-                            <p className="text-foreground/50 text-xs">
+                            <p className="dark:text-background">
+                              {set.set_number}
+                            </p>
+                            <p className="text-foreground/50 dark:text-background/75 text-xs">
                               (Reps: {set.target_reps})
                             </p>
                             <input

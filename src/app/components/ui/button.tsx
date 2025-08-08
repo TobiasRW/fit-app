@@ -17,11 +17,12 @@ export default function Button({
 }: ButtonProps) {
   const variants = {
     primary: disabled
-      ? "bg-faded-green text-background rounded-full"
-      : "bg-green text-background rounded-full",
-    secondary: "bg-gray text-foreground rounded-full dark:bg-dark-gray",
-    destructive: "bg-red text-background rounded-full",
-    basic: "bg-background text-foreground rounded-full",
+      ? "bg-faded-green text-background dark:text-foreground rounded-full"
+      : "bg-green text-background dark:text-foreground rounded-full",
+    secondary:
+      "bg-gray text-foreground dark:text-foreground rounded-full dark:bg-off-black",
+    destructive: "bg-red text-background dark:text-foreground rounded-full",
+    basic: "bg-background text-foreground dark:text-foreground rounded-full",
   };
 
   const sizes = {

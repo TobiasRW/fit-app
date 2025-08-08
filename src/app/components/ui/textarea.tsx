@@ -20,7 +20,7 @@ export default function Textarea({
   return (
     <div className="relative">
       {label && (
-        <label className="text-foreground bg-background absolute -top-3 left-3 px-2 font-medium">
+        <label className="text-foreground bg-background absolute -top-3 left-3 px-2 font-medium dark:bg-[#3d3d3d]">
           {label}
         </label>
       )}

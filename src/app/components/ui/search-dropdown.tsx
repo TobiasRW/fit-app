@@ -88,7 +88,7 @@ export default function SearchDropdown({
       />
 
       {isOpen && (
-        <div className="shadow-l absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white text-sm">
+        <div className="shadow-l dark:bg-background absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white text-sm dark:border-gray-600">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) => (
               <div

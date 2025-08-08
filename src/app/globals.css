@@ -4,6 +4,7 @@
   --background: #fbfbfb;
   --foreground: #0a0a0a;
   --green: #1db954;
+  --dark-green: #1a9c4b;
   --faded-green: #a8e5be;
   --gray: #ebebeb;
   --dark-gray: #2c2c2c;
@@ -31,6 +32,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-green: var(--green);
+  --color-dark-green: var(--dark-green);
   --color-faded-green: var(--faded-green);
   --color-gray: var(--gray);
   --color-dark-gray: var(--dark-gray);
