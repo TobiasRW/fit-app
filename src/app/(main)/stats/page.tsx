@@ -77,7 +77,7 @@ async function PRCard({
   }
 
   return (
-    <div className="bg-gray text-foreground flex h-26 w-26 flex-col items-center justify-between rounded-lg p-2 shadow-lg">
+    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-26 w-26 flex-col items-center justify-between rounded-lg p-2 shadow-lg">
       <div className="justify-center text-center">
         <p className="mb-4 text-sm">{name}</p>
         <p className={`text-4xl ${!pr ? "text-lg" : ""}`}>
@@ -221,7 +221,7 @@ async function StreakSquare() {
   }
 
   return (
-    <div className="bg-gray text-foreground flex h-40 w-40 flex-col items-center justify-between rounded-lg p-2 shadow-lg">
+    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-40 w-40 flex-col items-center justify-between rounded-lg p-2 shadow-lg">
       <p className="text-lg">Week streak</p>
       <p className="text-5xl">{streak.streak}</p>
       <p className="text-3xl">
@@ -232,11 +232,15 @@ async function StreakSquare() {
 }
 
 function LoadingPR() {
-  return <div className="bg-gray/50 h-26 w-26 animate-pulse rounded-lg" />;
+  return (
+    <div className="bg-gray/50 dark:bg-dark-gray/50 h-26 w-26 animate-pulse rounded-lg" />
+  );
 }
 
 function LoadingStreakSquare() {
-  return <div className="bg-gray/50 h-40 w-40 animate-pulse rounded-lg" />;
+  return (
+    <div className="bg-gray/50 dark:bg-dark-gray/50 h-40 w-40 animate-pulse rounded-lg" />
+  );
 }
 
 function LoadingTotalSquare() {
@@ -254,7 +258,7 @@ function LoadingBarChart() {
           >
             <div className="mb-2">
               <div
-                className="bg-gray w-8 rounded-t"
+                className="bg-gray dark:bg-dark-gray w-8 rounded-t"
                 style={{
                   height: `${Math.random() * 100}px`,
                   minHeight: "0px",
@@ -262,7 +266,7 @@ function LoadingBarChart() {
                 title={`${Math.random().toFixed(1)}%`}
               />
             </div>
-            <div className="border-gray absolute bottom-4 w-full border-b"></div>
+            <div className="border-gray dark:border-dark-gray absolute bottom-4 w-full border-b"></div>
           </div>
         ))}
       </div>
@@ -275,7 +279,7 @@ function LoadingWorkoutCompletion() {
     <div className="mt-4 animate-pulse">
       <div className="bg-foreground/10 relative h-3 w-full rounded-sm">
         <div
-          className="bg-gray absolute inset-0 rounded-sm"
+          className="bg-gray dark:bg-dark-gray absolute inset-0 rounded-sm"
           style={{ width: `${Math.floor(Math.random() * 100)}%` }}
         ></div>
       </div>
