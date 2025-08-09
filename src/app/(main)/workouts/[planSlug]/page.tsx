@@ -27,28 +27,6 @@ export default async function Page({
   );
 }
 
-function WorkoutsLoading() {
-  return (
-    <>
-      <div className="flex items-center justify-between">
-        <div className="bg-gray dark:bg-dark-gray h-10 w-64 animate-pulse rounded" />
-        <PencilIcon size={20} className="text-green" />
-      </div>
-
-      <div className="mt-8">
-        <div className="grid grid-cols-1 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-gray dark:bg-dark-gray h-24 animate-pulse rounded-lg"
-            />
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
-
 // Single component that loads all workout plan data
 async function WorkoutPlanContent({ planSlug }: { planSlug: string }) {
   const workoutPlan = await getWorkoutPlan(planSlug);
@@ -107,6 +85,30 @@ async function WorkoutPlanContent({ planSlug }: { planSlug: string }) {
         {workoutPlan.workouts.length <= 7 && (
           <AddWorkoutModal planId={workoutPlan.id} />
         )}
+      </div>
+    </>
+  );
+}
+
+function WorkoutsLoading() {
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <h1 className="text-gray dark:text-dark-gray animate-pulse text-4xl font-bold">
+          Workout Plan
+        </h1>
+        <PencilIcon size={20} className="text-green" />
+      </div>
+
+      <div className="mt-8">
+        <div className="grid grid-cols-1 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-gray dark:bg-dark-gray h-24 animate-pulse rounded-lg"
+            />
+          ))}
+        </div>
       </div>
     </>
   );

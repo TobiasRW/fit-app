@@ -19,21 +19,6 @@ export default async function Page() {
   );
 }
 
-function WorkoutPlansLoading() {
-  return (
-    <div className="mt-8">
-      <div className="grid grid-cols-1 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="bg-gray dark:bg-dark-gray h-26 animate-pulse rounded-lg"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 async function WorkoutPlansList() {
   const workoutPlans = await getUserWorkoutPlans();
 
@@ -75,5 +60,20 @@ async function WorkoutPlansList() {
       </div>
       <CreateWorkoutModal />
     </>
+  );
+}
+
+function WorkoutPlansLoading() {
+  return (
+    <div className="mt-8">
+      <div className="grid grid-cols-1 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="bg-gray dark:bg-dark-gray h-26 animate-pulse rounded-lg"
+          />
+        ))}
+      </div>
+    </div>
   );
 }

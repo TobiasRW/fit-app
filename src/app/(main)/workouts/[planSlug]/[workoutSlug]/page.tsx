@@ -32,31 +32,6 @@ export default async function Page({
   );
 }
 
-function WorkoutContentLoading() {
-  return (
-    <>
-      {/* Header skeleton */}
-      <div className="flex items-center justify-between">
-        <div className="bg-gray dark:bg-dark-gray h-10 w-48 animate-pulse rounded" />
-        <PencilIcon size={20} className="text-green" />
-      </div>
-
-      {/* Exercises skeleton */}
-      <div className="mt-4">
-        <h2 className="text-2xl font-semibold">Exercises</h2>
-        <div className="mt-4 space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-gray dark:bg-dark-gray h-18 animate-pulse rounded-lg"
-            />
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
-
 // Single component that loads all workout and exercise data
 async function WorkoutContent({
   planSlug,
@@ -134,6 +109,33 @@ async function WorkoutContent({
           workoutId={workout.id}
         />
       )}
+    </>
+  );
+}
+
+function WorkoutContentLoading() {
+  return (
+    <>
+      {/* Header skeleton */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-gray dark:text-dark-gray animate-pulse text-4xl font-bold">
+          Workout
+        </h1>
+        <PencilIcon size={20} className="text-green" />
+      </div>
+
+      {/* Exercises skeleton */}
+      <div className="mt-4">
+        <h2 className="text-2xl font-semibold">Exercises</h2>
+        <div className="mt-4 space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="bg-gray dark:bg-dark-gray h-18 animate-pulse rounded-lg"
+            />
+          ))}
+        </div>
+      </div>
     </>
   );
 }
