@@ -6,10 +6,10 @@ import Button from "./ui/button";
 import { useActionState, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  deleteWorkout,
-  deleteWorkoutPlan,
   setActivePlan,
   deactivatePlan,
+  softDeleteWorkoutPlan,
+  softDeleteWorkout,
 } from "../(main)/workouts/actions";
 import Form from "next/form";
 import { InitialState } from "../types";
@@ -110,12 +110,14 @@ export default function WorkoutCard({
                 disabled={currentPending}
               />
             </Form>
-            <Button
-              variant="destructive"
-              text="Delete"
-              size="extrasmall"
-              onClick={() => setIsOpen(true)}
-            />
+            {!isActive && (
+              <Button
+                variant="destructive"
+                text="Delete"
+                size="extrasmall"
+                onClick={() => setIsOpen(true)}
+              />
+            )}
           </div>
         )}
         {variant === "workout" && (
@@ -142,7 +144,9 @@ export default function WorkoutCard({
             workoutId={workoutId}
             setIsOpen={setIsOpen}
             variant={variant}
-            action={variant === "plan" ? deleteWorkoutPlan : deleteWorkout}
+            action={
+              variant === "plan" ? softDeleteWorkoutPlan : softDeleteWorkout
+            }
           />
         )}
       </AnimatePresence>
@@ -184,7 +188,6 @@ export function DeleteModal({
       >
         {variant === "workout" && (
           <>
-            <input type="hidden" name="planId" value={planId} />
             <input type="hidden" name="planSlug" value={planSlug} />
             <input type="hidden" name="workoutId" value={workoutId} />
           </>

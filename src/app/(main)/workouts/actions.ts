@@ -16,6 +16,7 @@ export async function getUserWorkoutPlans() {
   const { data: workoutPlans, error } = await supabase
     .from("workout_plans")
     .select("id, name, slug, is_active")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -45,6 +46,7 @@ export async function getWorkoutPlan(slug: string) {
     `,
     )
     .eq("slug", slug)
+    .is("workouts.deleted_at", null)
     .order("order_index", { referencedTable: "workouts", ascending: true })
     .single();
 
@@ -116,6 +118,7 @@ export async function getExercisesFromWorkout(workoutId: string) {
     `,
     )
     .eq("workout_id", workoutId)
+    .is("deleted_at", null)
     .order("order_index", { ascending: true })
     .overrideTypes<WorkoutExercise[]>();
 
@@ -576,6 +579,116 @@ export async function deleteWorkoutPlan(
     return { success: true };
   } catch (error) {
     console.error("Unexpected error deleting workout plan:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+// ________________ SOFT DELETE FUNCTIONS (SOFT DELETE) ________________
+
+// Function to soft delete a workout plan
+export async function softDeleteWorkoutPlan(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  try {
+    const supabase = await createClient();
+    const planId = formData.get("planId") as string;
+
+    if (!planId) {
+      return { error: "Plan ID is required" };
+    }
+
+    const { error: deleteError } = await supabase.rpc(
+      "soft_delete_workout_plan",
+      { plan_id: planId },
+    );
+
+    if (deleteError) {
+      console.log("Delete error:", deleteError);
+      return {
+        error:
+          deleteError.message ||
+          "Failed to delete workout plan. Please try again.",
+      };
+    }
+
+    revalidatePath("/workouts");
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting workout plan:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+// Function to soft delete a workout
+export async function softDeleteWorkout(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  try {
+    const supabase = await createClient();
+    const workoutId = formData.get("workoutId") as string;
+    const planSlug = formData.get("planSlug") as string;
+
+    if (!workoutId) {
+      return { error: "Workout ID is required" };
+    }
+
+    const { error: deleteError } = await supabase.rpc("soft_delete_workout", {
+      workout_id: workoutId,
+    });
+
+    if (deleteError) {
+      console.log("Delete error:", deleteError);
+      return { error: "Failed to delete workout. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting workout:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
+// Function to soft delete a workout exercise
+export async function softDeleteWorkoutExercise(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  try {
+    const supabase = await createClient();
+
+    const workoutExerciseId = formData.get("workoutExerciseId") as string;
+    const planSlug = formData.get("planSlug") as string;
+    const workoutSlug = formData.get("workoutSlug") as string;
+
+    if (!workoutExerciseId) {
+      return { error: "Workout exercise ID is required" };
+    }
+
+    const { error: deleteError } = await supabase.rpc(
+      "soft_delete_workout_exercise",
+      {
+        workout_exercise_id: workoutExerciseId,
+      },
+    );
+
+    if (deleteError) {
+      console.log("Delete error:", deleteError);
+      return { error: "Failed to delete exercise. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error deleting exercise from workout:", error);
     return {
       error: "An unexpected error occurred. Please try again.",
     };

@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import Form from "next/form";
 import Button from "./ui/button";
-import { deleteExerciseFromWorkout } from "../(main)/workouts/actions";
+import { softDeleteWorkoutExercise } from "../(main)/workouts/actions";
 import EditExerciseModal from "./modals/edit-exercise-modal";
 import { WorkoutExercise } from "@/app/types";
 
@@ -131,7 +131,6 @@ export function DeleteExerciseModal({
   exerciseId,
   planSlug,
   workoutSlug,
-  workoutId,
   setIsDeleting,
 }: {
   exercise: WorkoutExercise;
@@ -142,7 +141,7 @@ export function DeleteExerciseModal({
   setIsDeleting: (isDeleting: boolean) => void;
 }) {
   const [state, formAction, pending] = useActionState(
-    deleteExerciseFromWorkout,
+    softDeleteWorkoutExercise,
     {},
   );
 
@@ -168,7 +167,6 @@ export function DeleteExerciseModal({
         <input type="hidden" name="workoutExerciseId" value={exerciseId} />
         <input type="hidden" name="planSlug" value={planSlug} />
         <input type="hidden" name="workoutSlug" value={workoutSlug} />
-        <input type="hidden" name="workoutId" value={workoutId} />
 
         <div className="mb-4 flex flex-col items-center justify-between text-center">
           <h2 className="text-2xl font-semibold">
