@@ -48,8 +48,8 @@ async function WorkoutContent({
         <div className="flex items-center justify-between">
           <h1 className="text-4xl font-bold">Workout not found</h1>
         </div>
-        <div className="mt-8">
-          <ErrorCard errorText={workout.error} variant="primary" />
+        <div className="mt-8 h-26">
+          <ErrorCard errorText={workout.error} variant="secondary" />
         </div>
       </>
     );
@@ -59,8 +59,8 @@ async function WorkoutContent({
 
   if ("error" in exercises) {
     return (
-      <div className="mt-8">
-        <ErrorCard errorText={exercises.error} variant="primary" />
+      <div className="mt-8 h-26">
+        <ErrorCard errorText={exercises.error} variant="secondary" />
       </div>
     );
   }

@@ -25,8 +25,8 @@ async function CurrentWorkoutContent({ workoutSlug }: { workoutSlug: string }) {
 
   if ("error" in workout) {
     return (
-      <div className="mt-8">
-        <ErrorCard errorText={workout.error} variant="primary" />
+      <div className="mt-10 h-26">
+        <ErrorCard errorText={workout.error} variant="secondary" />
       </div>
     );
   }
