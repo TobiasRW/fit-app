@@ -13,7 +13,7 @@ const archivo = localFont({
 });
 
 const APP_NAME = "Fit App";
-const APP_DEFAULT_TITLE = "Fit App - Your Fitness Companion";
+const APP_DEFAULT_TITLE = "Fit App - Your workout tracker";
 const APP_TITLE_TEMPLATE = "%s - PWA App";
 const APP_DESCRIPTION = "Best fitness app in the world!";
 
