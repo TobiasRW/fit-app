@@ -1,5 +1,5 @@
 {
-  "name": "Fit App - Your Fitness Companion",
+  "name": "Fit App - Your workout tracker",
   "short_name": "Fit App",
   "start_url": "/",
   "display": "standalone",
