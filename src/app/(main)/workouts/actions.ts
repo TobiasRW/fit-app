@@ -4,12 +4,14 @@ import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { WorkoutExercise, InitialState } from "@/app/types";
 import { checkAuthentication, generateSlug } from "@/utils/helpers/helpers";
+import { createClient } from "@/utils/supabase/server";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
 
 // Function to get all the user's workout plans
 export async function getUserWorkoutPlans() {
-  const { supabase } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase } = await checkAuthentication();
 
   const { data: workoutPlans, error } = await supabase
     .from("workout_plans")
