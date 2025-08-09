@@ -277,6 +277,9 @@ function LoadingBarChart() {
 function LoadingWorkoutCompletion() {
   return (
     <div className="mt-4 animate-pulse">
+      <p className="text-gray dark:text-dark-gray mb-2 font-light italic">
+        25 / 156 workouts completed
+      </p>
       <div className="bg-foreground/10 relative h-3 w-full rounded-sm">
         <div
           className="bg-gray dark:bg-dark-gray absolute inset-0 rounded-sm"
