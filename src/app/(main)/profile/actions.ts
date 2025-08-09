@@ -8,12 +8,12 @@ import { redirect } from "next/navigation";
 // Function to get the users goal
 export async function getUserGoal() {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const supabase = await createClient();
+    // const { supabase, user } = await checkAuthentication();
 
     const { data, error } = await supabase
       .from("user_settings")
       .select("workout_goal_per_week")
-      .eq("id", user.id)
       .single();
 
     if (error) {

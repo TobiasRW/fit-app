@@ -1,6 +1,6 @@
 "use server";
 
-import { checkAuthentication } from "@/utils/helpers/helpers";
+// import { checkAuthentication } from "@/utils/helpers/helpers";
 import { CompletedWorkout, Streak, UpcomingWorkout } from "../types";
 import {
   startOfWeek,
@@ -9,13 +9,13 @@ import {
   getYear,
   startOfISOWeek,
 } from "date-fns";
+import { createClient } from "@/utils/supabase/server";
 
 export async function getNextWorkout(): Promise<UpcomingWorkout> {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
 
-  const { data, error } = await supabase.rpc("get_upcoming_workout", {
-    user_uuid: user.id,
-  });
+  const { data, error } = await supabase.rpc("get_upcoming_workout");
 
   if (!data || data.length === 0) {
     return null;
@@ -42,7 +42,8 @@ export async function getNextWorkout(): Promise<UpcomingWorkout> {
 export async function getWeeklyCompletedWorkouts(): Promise<
   CompletedWorkout[] | { error: string }
 > {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
 
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
   const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 }).toISOString();
@@ -80,7 +81,6 @@ export async function getWeeklyCompletedWorkouts(): Promise<
       )
     `,
     )
-    .eq("user_id", user.id)
     .gte("completed_at", weekStart)
     .lte("completed_at", weekEnd)
     .order("completed_at", { ascending: true })
@@ -99,13 +99,13 @@ export async function getWeeklyCompletedWorkouts(): Promise<
 
 // Function to get the users week streak based on their completed workouts goal
 export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
 
   // 1. Get goal
   const { data: settings, error: settingsError } = await supabase
     .from("user_settings")
     .select("workout_goal_per_week")
-    .eq("id", user.id)
     .single();
 
   if (settingsError) {
@@ -117,8 +117,7 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
   // 2. Get all completed workouts
   const { data, error } = await supabase
     .from("completed_workouts")
-    .select("completed_at")
-    .eq("user_id", user.id);
+    .select("completed_at");
 
   if (error) {
     console.error("Error fetching completed workouts:", error);

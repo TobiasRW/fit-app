@@ -64,7 +64,8 @@ export async function getWorkoutFromPlan(
   planSlug: string,
   workoutSlug: string,
 ) {
-  const { supabase } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase } = await checkAuthentication();
 
   const { data: workout, error } = await supabase
     .from("workouts")
@@ -94,7 +95,8 @@ export async function getWorkoutFromPlan(
 
 // Function to get exercises from a workout
 export async function getExercisesFromWorkout(workoutId: string) {
-  const { supabase } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase } = await checkAuthentication();
 
   const { data: workoutExercises, error } = await supabase
     .from("workout_exercises")
@@ -131,7 +133,7 @@ export async function getExercisesFromWorkout(workoutId: string) {
 }
 // Function to get all exercises from the database
 export async function getAllExercises() {
-  const { supabase } = await checkAuthentication();
+  const supabase = await createClient();
 
   const { data: exercises, error } = await supabase
     .from("exercises")

@@ -1,16 +1,17 @@
-import { checkAuthentication } from "@/utils/helpers/helpers";
+// import { checkAuthentication } from "@/utils/helpers/helpers";
+import { createClient } from "@/utils/supabase/server";
 import { getDay } from "date-fns";
 
 export async function getTotalCompletedWorkouts(): Promise<
   number | { error: string }
 > {
   {
-    const { supabase, user } = await checkAuthentication();
+    const supabase = await createClient();
+    // const { supabase, user } = await checkAuthentication();
 
     const { count, error } = await supabase
       .from("completed_workouts")
-      .select("user_id", { count: "exact" })
-      .eq("user_id", user.id);
+      .select("user_id", { count: "exact" });
 
     if (error) {
       return { error: "Failed to load your completed workouts" };
@@ -28,13 +29,13 @@ type DayOfWeekCount = {
 export async function getUserDayOfWeekCounts(): Promise<
   DayOfWeekCount[] | { error: string }
 > {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
 
   // Fetch all completed workouts
   const { data, error } = await supabase
     .from("completed_workouts")
-    .select("completed_date")
-    .eq("user_id", user.id);
+    .select("completed_date");
 
   if (error) {
     console.error("Error fetching completed workouts:", error);
@@ -65,14 +66,14 @@ export async function getUserDayOfWeekCounts(): Promise<
 export async function getUserBenchPressPR(): Promise<
   number | { error: string } | null
 > {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
   const benchPressId = "e09e6102-0cd4-4b11-8774-4a7251b146a4";
 
   // Get all completed_exercise IDs for bench press
   const { data: exercises, error: exercisesError } = await supabase
     .from("completed_exercises")
     .select("id")
-    .eq("user_id", user.id)
     .eq("exercise_id", benchPressId);
 
   if (exercisesError) {
@@ -106,14 +107,14 @@ export async function getUserBenchPressPR(): Promise<
 export async function getUserSquatPR(): Promise<
   number | { error: string } | null
 > {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
   const squatId = "8ec9d613-55e8-4598-b37b-7bb45ad0ab20";
 
   // Get all completed_exercise IDs for squat
   const { data: exercises, error: exercisesError } = await supabase
     .from("completed_exercises")
     .select("id")
-    .eq("user_id", user.id)
     .eq("exercise_id", squatId);
 
   if (exercisesError) {
@@ -146,14 +147,14 @@ export async function getUserSquatPR(): Promise<
 export async function getUserDeadliftPR(): Promise<
   number | { error: string } | null
 > {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
   const deadliftId = "aa9ccfd3-d333-40cc-a3df-ad6d3ce5c800";
 
   // Get all completed_exercise IDs for deadlift
   const { data: exercises, error: exercisesError } = await supabase
     .from("completed_exercises")
     .select("id")
-    .eq("user_id", user.id)
     .eq("exercise_id", deadliftId);
 
   if (exercisesError) {

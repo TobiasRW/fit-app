@@ -2,6 +2,7 @@
 
 import { CurrentWorkout, InitialState } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
+import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
@@ -10,13 +11,13 @@ import { revalidatePath } from "next/cache";
 export async function getCurrentWorkout(
   workoutSlug: string,
 ): Promise<CurrentWorkout | { error: string }> {
-  const { supabase, user } = await checkAuthentication();
+  const supabase = await createClient();
+  // const { supabase, user } = await checkAuthentication();
 
   const { data, error } = await supabase.rpc(
     "get_workout_with_last_performance",
     {
       workout_slug_param: workoutSlug,
-      user_id_param: user.id,
     },
   );
 
