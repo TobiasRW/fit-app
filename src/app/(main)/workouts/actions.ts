@@ -17,7 +17,7 @@ export async function getUserWorkoutPlans() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    throw new Error("Failed to fetch workout plans");
+    return { error: "Failed to load workout plans" };
   }
 
   return workoutPlans || [];
@@ -46,7 +46,11 @@ export async function getWorkoutPlan(slug: string) {
     .order("order_index", { referencedTable: "workouts", ascending: true })
     .single();
 
-  if (error || !workoutPlan) {
+  if (error) {
+    return { error: "Failed to load workout plan" };
+  }
+
+  if (!workoutPlan) {
     notFound();
   }
 
@@ -75,7 +79,11 @@ export async function getWorkoutFromPlan(
     .eq("workout_plans.slug", planSlug)
     .single();
 
-  if (error || !workout) {
+  if (error) {
+    return { error: "Failed to load workout" };
+  }
+
+  if (!workout) {
     notFound();
   }
 
@@ -108,7 +116,7 @@ export async function getExercisesFromWorkout(workoutId: string) {
     .overrideTypes<WorkoutExercise[]>();
 
   if (error) {
-    throw new Error("Failed to fetch exercises from workout");
+    return { error: "Failed to load exercises" };
   }
 
   // Sort sets by set_number and return the result
