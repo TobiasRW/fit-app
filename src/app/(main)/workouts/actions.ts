@@ -48,12 +48,12 @@ export async function getWorkoutPlan(slug: string) {
     .order("order_index", { referencedTable: "workouts", ascending: true })
     .single();
 
-  if (error) {
-    return { error: "Failed to load workout plan" };
-  }
-
   if (!workoutPlan) {
     notFound();
+  }
+
+  if (error) {
+    return { error: "Failed to load workout plan" };
   }
 
   return workoutPlan;
@@ -82,12 +82,12 @@ export async function getWorkoutFromPlan(
     .eq("workout_plans.slug", planSlug)
     .single();
 
-  if (error) {
-    return { error: "Failed to load workout" };
-  }
-
   if (!workout) {
     notFound();
+  }
+
+  if (error) {
+    return { error: "Failed to load workout" };
   }
 
   return workout;
