@@ -101,17 +101,7 @@ async function WorkoutSection() {
 // Loading component for the workout section
 function WorkoutSkeleton() {
   return (
-    <div className="bg-gray dark:bg-dark-gray relative flex h-28 animate-pulse flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
-      <div className="bg-gray dark:bg-dark-gray absolute inset-0 rounded-lg"></div>
-
-      <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">
-        <div className="bg-background/40 mb-1 h-6 w-3/4 rounded-lg"></div>
-      </div>
-
-      <div className="relative z-20 pl-2">
-        <div className="bg-background/40 h-4 w-1/2 rounded-lg"></div>
-      </div>
-    </div>
+    <div className="bg-gray dark:bg-dark-gray relative flex h-26 animate-pulse flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md"></div>
   );
 }
 
@@ -200,20 +190,22 @@ function LoadingStatsSection() {
   return (
     <div className="">
       <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
-        {/* WorkoutStats skeleton */}
-        <div className="bg-gray dark:bg-dark-gray flex animate-pulse flex-col items-center justify-center rounded-lg p-4">
-          <div className="bg-gray dark:bg-dark-gray mb-2 h-12 w-24 animate-pulse rounded-lg"></div>
-          <div className="bg-gray dark:bg-dark-gray h-4 w-20 animate-pulse rounded-lg"></div>
+        <div className="">
+          <p className="text-gray dark:text-dark-gray animate-pulse text-center text-6xl font-medium">
+            3/3
+          </p>
+          <div className="bg-gray dark:bg-dark-gray my-2 h-2 w-30 animate-pulse rounded-lg"></div>
         </div>
-        {/* WeekStreak skeleton */}
-        <div className="bg-gray dark:bg-dark-gray flex animate-pulse flex-col items-center justify-center rounded-lg p-4">
-          <div className="bg-gray dark:bg-dark-gray mb-2 h-12 w-16 animate-pulse rounded-lg"></div>
-          <div className="bg-gray dark:bg-dark-gray h-4 w-20 animate-pulse rounded-lg"></div>
+
+        <div className="">
+          <p className="text-gray dark:text-dark-gray animate-pulse text-center text-6xl font-medium opacity-25">
+            🔥
+          </p>
+          <div className="bg-gray dark:bg-dark-gray my-2 h-2 w-18 animate-pulse rounded-lg"></div>
         </div>
       </div>
-      <div className="mt-10">
-        <h3 className="bg-gray dark:bg-dark-gray mb-4 h-6 w-1/2 animate-pulse rounded"></h3>
-        {/* Simulate loading for workout cards or fallback */}
+      <div className="mt-6">
+        <h3 className="mb-4 text-xl">This weeks completed workouts:</h3>
         <div className="space-y-4">
           <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
             <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
