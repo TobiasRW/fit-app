@@ -24,7 +24,7 @@ export default function ErrorCard({
   return (
     <>
       <div
-        className={`bg-faded-red flex flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md ${isPending ? "animate-pulse opacity-50" : ""} ${variant === "primary" ? "h-28" : "h-full w-full"}`}
+        className={`bg-faded-red flex flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md ${isPending ? "animate-pulse opacity-50" : ""} ${variant === "primary" ? "h-26" : "h-full w-full"}`}
       >
         {/* Text positioned in center of entire card */}
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">

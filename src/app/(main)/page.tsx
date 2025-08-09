@@ -31,7 +31,7 @@ export default async function Home() {
         </h1>
       </section>
 
-      <section className="relative mt-10 space-y-4">
+      <section className="relative mt-6 space-y-4">
         <div className="space-y-2">
           <h2 className="text-2xl font-medium">Next Workout</h2>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
@@ -41,7 +41,7 @@ export default async function Home() {
         </Suspense>
       </section>
 
-      <section className="relative mt-10 space-y-4">
+      <section className="relative mt-6 space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-medium">Weekly Stats</h2>
@@ -145,7 +145,7 @@ async function StatsSection() {
         <WorkoutStats workouts={thisWeeksWorkouts} streak={streak} />
         <WeekStreak streak={streak} />
       </div>
-      <div className="mt-10">
+      <div className="mt-6">
         <h3 className="mb-4 text-xl">This weeks completed workouts:</h3>
         {thisWeeksWorkouts.length > 0 ? (
           <div className="space-y-4">
@@ -174,7 +174,7 @@ async function WorkoutStats({
 }) {
   return (
     <div className="">
-      <p className="text-foreground text-center text-7xl font-medium">
+      <p className="text-foreground text-center text-6xl font-medium">
         {workouts?.length}/{streak?.goal}
       </p>
       <p className="text-foreground text-sm font-light">Workouts this week</p>
@@ -185,7 +185,7 @@ async function WorkoutStats({
 async function WeekStreak({ streak }: { streak?: Streak }) {
   return (
     <div className="">
-      <p className="text-foreground text-center text-7xl font-medium">
+      <p className="text-foreground text-center text-6xl font-medium">
         {streak?.streak && streak.streak > 0 ? "🔥" : "❄️"}
       </p>
       <p className="text-foreground text-sm font-light">

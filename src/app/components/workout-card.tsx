@@ -59,7 +59,7 @@ export default function WorkoutCard({
 
   return (
     <>
-      <div className="bg-gray dark:bg-dark-gray relative flex h-28 flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
+      <div className="bg-gray dark:bg-dark-gray relative flex h-26 flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
         {/* Make entire card clickable */}
         <Link
           href={

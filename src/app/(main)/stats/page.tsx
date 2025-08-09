@@ -22,7 +22,7 @@ export default async function Page() {
       <main className="mx-auto mt-10 w-11/12 pb-30">
         <h1 className="text-4xl font-bold">Your Stats</h1>
 
-        <section className="mt-10">
+        <section className="mt-6">
           <div className="flex justify-between">
             <Suspense fallback={<LoadingTotalSquare />}>
               <TotalSquare />

@@ -81,7 +81,7 @@ export default function EditExerciseModal({
 
         {/* Exercise Name Display */}
         <div className="mx-auto w-11/12">
-          <div className="rounded-lg bg-gray-100 p-4">
+          <div className="dark:bg-dark-gray rounded-lg bg-gray-100 p-4">
             <h3 className="text-center text-lg font-medium">
               {exercise.exercises.name}
             </h3>
