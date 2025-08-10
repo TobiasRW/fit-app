@@ -19,7 +19,7 @@ export default async function Page({
   const { planSlug, workoutSlug } = await params;
 
   return (
-    <main className="mx-auto mt-10 w-11/12">
+    <main className="mx-auto mt-10 w-11/12 pb-20">
       <Link href={`/workouts/${planSlug}`} className="my-2 flex items-center">
         <CaretLeftIcon size={20} className="text-green" /> Back
       </Link>
