@@ -4,11 +4,14 @@ import { CaretDownIcon } from "@phosphor-icons/react";
 import { useState } from "react";
 import { CompletedWorkout } from "../types";
 
+type Props = {
+  exercise: CompletedWorkout;
+  showFullDate?: boolean; // More specific prop
+};
 export default function CompletedExerciseCard({
   exercise,
-}: {
-  exercise: CompletedWorkout;
-}) {
+  showFullDate = false,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   // function to format date to a readable format
@@ -16,14 +19,15 @@ export default function CompletedExerciseCard({
     const d = new Date(date);
     const day = d.getDate();
     const month = d.getMonth() + 1;
-    return `${day}/${month}`;
+    const year = d.getFullYear();
+    return showFullDate ? `${day}/${month}/${year}` : `${day}/${month}`;
   };
 
   return (
     <>
       <div className="bg-gray dark:bg-dark-gray gap-2 rounded-lg shadow-md">
         <div className="flex w-full items-center justify-between px-2 py-3">
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <p className="font-medium">{formatDate(exercise.completed_date)}</p>
             <span> - </span>
             <p>{exercise.workouts.name}</p>

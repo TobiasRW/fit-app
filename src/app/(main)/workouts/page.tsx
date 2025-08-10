@@ -36,6 +36,7 @@ async function WorkoutPlansList() {
         <div className="grid grid-cols-1 gap-4">
           {workoutPlans.map((plan) => (
             <WorkoutCard
+              href={`/workouts/${plan.slug}`}
               key={plan.slug}
               name={plan.name}
               planSlug={plan.slug}

@@ -4,6 +4,7 @@ import { getUserGoal, signOut } from "./actions";
 import EditGoalModal from "@/app/components/modals/edit-goal-modal";
 import Button from "@/app/components/ui/button";
 import { Suspense } from "react";
+import Link from "next/link";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -17,8 +18,15 @@ export default async function Page() {
         <h1 className="text-4xl font-bold">Your Profile</h1>
         <section className="mt-10 flex flex-col items-center justify-center">
           <Avatar user={user!} />
+          <Link href="/profile/history" className="mt-2">
+            <Button
+              text="View Workout History"
+              variant="primary"
+              size="small"
+            />
+          </Link>
         </section>
-        <section className="mt-10 space-y-4">
+        <section className="mt-6 space-y-4">
           <div className="space-y-2">
             <h2 className="text-2xl font-medium">Your Goal</h2>
             <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
@@ -54,10 +62,9 @@ async function GoalSection() {
         <p className="text-6xl">{goal.workout_goal_per_week}</p>
         <p className="text-foreground font-light">Workouts per week</p>
       </div>
-      <div className="mt-4 flex items-center justify-center">
-        <div className="mt-4 flex items-center justify-center">
-          <EditGoalModal goal={goal.workout_goal_per_week} />
-        </div>
+
+      <div className="mt-2 flex items-center justify-center">
+        <EditGoalModal goal={goal.workout_goal_per_week} />
       </div>
     </div>
   );

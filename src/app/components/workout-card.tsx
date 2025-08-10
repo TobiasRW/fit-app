@@ -14,19 +14,19 @@ import {
 import Form from "next/form";
 import { InitialState } from "../types";
 
-type CardVariant = "plan" | "workout" | "upcoming";
+type CardVariant = "plan" | "workout" | "upcoming" | "history";
 
 type WorkoutCardProps = {
   name: string;
   secondName?: string;
   planSlug?: string;
   planId?: string;
-  workoutSlug?: string;
   workoutId?: string;
   variant?: CardVariant;
   isActive?: boolean;
   progress?: string;
   completed?: boolean;
+  href: string;
 };
 
 export default function WorkoutCard({
@@ -34,12 +34,12 @@ export default function WorkoutCard({
   secondName,
   planSlug,
   planId,
-  workoutSlug,
   workoutId,
   variant = "workout",
   isActive,
   progress,
   completed = false,
+  href,
 }: WorkoutCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   // Separate hooks for each action
@@ -61,16 +61,7 @@ export default function WorkoutCard({
     <>
       <div className="bg-gray dark:bg-dark-gray relative flex h-26 flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md">
         {/* Make entire card clickable */}
-        <Link
-          href={
-            variant === "plan"
-              ? `/workouts/${planSlug}`
-              : variant === "workout"
-                ? `/workouts/${planSlug}/${workoutSlug}`
-                : `/session/${workoutSlug}`
-          }
-          className="absolute inset-0 z-30"
-        ></Link>
+        <Link href={href} className="absolute inset-0 z-30"></Link>
 
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">
           <h2 className="text-xl font-bold">{name}</h2>

@@ -85,11 +85,11 @@ async function WorkoutSection() {
   return (
     <>
       <WorkoutCard
+        href={`/session/${nextWorkout.workoutSlug}`}
         name={nextWorkout.workoutName}
         secondName={nextWorkout.planName}
         workoutId={nextWorkout.id}
         planSlug={nextWorkout.planSlug}
-        workoutSlug={nextWorkout.workoutSlug}
         progress={nextWorkout.progress}
         completed={nextWorkout.completed}
         variant="upcoming"

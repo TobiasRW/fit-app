@@ -62,10 +62,10 @@ async function WorkoutPlanContent({ planSlug }: { planSlug: string }) {
             <div className="grid grid-cols-1 gap-4">
               {workoutPlan.workouts.map((workout) => (
                 <WorkoutCard
+                  href={`/workouts/${workoutPlan.slug}/${workout.slug}`}
                   key={workout.slug}
                   name={workout.name}
                   planSlug={workoutPlan.slug}
-                  workoutSlug={workout.slug}
                   variant="workout"
                   planId={workoutPlan.id}
                   workoutId={workout.id}

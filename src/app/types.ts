@@ -52,12 +52,6 @@ export type WorkoutSet = {
   lastWeight?: number;
 };
 
-// export type CompletedSet = {
-//   set_number: number;
-//   reps: number;
-//   weight: number;
-// };
-
 export type LastPerformance = {
   notes: string | null;
   sets: CompletedSet[];
@@ -119,6 +113,11 @@ export type CompletedWorkout = {
     id: string;
     name: string;
     slug: string;
+    workout_plans?: {
+      id: string;
+      name: string;
+      slug: string;
+    };
   };
   completed_exercises: CompletedExercise[];
 };
