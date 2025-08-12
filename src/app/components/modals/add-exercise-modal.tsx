@@ -40,12 +40,12 @@ export default function AddExerciseModal({
 
   // Close modal on success
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success && !pending) {
       setIsOpen(false);
       setSelectedExercise("");
       setNumberOfSets(3);
     }
-  }, [state?.success]);
+  }, [state?.success, pending]);
 
   return (
     <>

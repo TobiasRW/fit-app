@@ -15,10 +15,10 @@ export default function CreateWorkoutModal() {
 
   // Close the modal when the form is successfully submitted
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success && !pending) {
       setIsOpen(false);
     }
-  }, [state]);
+  }, [state, pending]);
 
   return (
     <>

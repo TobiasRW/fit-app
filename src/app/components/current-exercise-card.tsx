@@ -129,6 +129,7 @@ export default function CurrentExerciseCard({
                           <td className="border-r px-2 py-2 text-center">
                             <Input
                               type="number"
+                              step="0.01"
                               name="reps"
                               defaultValue={
                                 exercise.currentSessionData?.sets?.find(
@@ -145,6 +146,7 @@ export default function CurrentExerciseCard({
                               variant="table"
                               type="number"
                               name="weight"
+                              step="0.01"
                               defaultValue={
                                 exercise.currentSessionData?.sets?.find(
                                   (s) => s.set_number === set.set_number,

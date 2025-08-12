@@ -11,6 +11,7 @@ type InputProps = {
   required?: boolean;
   ref?: React.Ref<HTMLInputElement>;
   value?: string | number;
+  step?: string | number;
   defaultValue?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
@@ -29,6 +30,7 @@ export default function Input({
   ref,
   disabled,
   defaultValue,
+  step,
   value,
   onChange,
   onFocus,
@@ -43,6 +45,7 @@ export default function Input({
     <div className="flex flex-col space-y-1">
       {label && <label className="font-medium">{label}</label>}
       <input
+        step={step}
         className={`${variants[variant]}`}
         placeholder={placeholder}
         type={type}
