@@ -2,8 +2,8 @@
 
 import { CurrentWorkout, InitialState } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
-import { createClient } from "@/utils/supabase/server";
-import { revalidatePath } from "next/cache";
+import { createServiceClient } from "@/utils/supabase/service-client";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
 
@@ -11,31 +11,41 @@ import { revalidatePath } from "next/cache";
 export async function getCurrentWorkout(
   workoutSlug: string,
 ): Promise<CurrentWorkout | { error: string }> {
-  const supabase = await createClient();
-  // const { supabase, user } = await checkAuthentication();
+  const { user } = await checkAuthentication();
 
-  const { data, error } = await supabase.rpc(
-    "get_workout_with_last_performance",
-    {
-      workout_slug_param: workoutSlug,
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
+      const { data, error } = await supabase.rpc(
+        "get_workout_with_last_performance",
+        {
+          workout_slug_param: workoutSlug,
+          user_id_param: user.id,
+        },
+      );
+
+      if (error) {
+        console.error("RPC error:", error);
+        return { error: "Database error occurred" };
+      }
+
+      if (!data || data === null) {
+        return { error: "Workout not found or you don't have access to it" };
+      }
+
+      // Check if workout has no exercises
+      if (!data.exercises || data.exercises.length === 0) {
+        return { error: "This workout has no exercises configured" };
+      }
+
+      return data;
     },
+    [`current-workout-${workoutSlug}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
   );
 
-  if (error) {
-    console.error("RPC error:", error);
-    return { error: "Database error occurred" };
-  }
-
-  if (!data || data === null) {
-    return { error: "Workout not found or you don't have access to it" };
-  }
-
-  // Check if workout has no exercises
-  if (!data.exercises || data.exercises.length === 0) {
-    return { error: "This workout has no exercises configured" };
-  }
-
-  return data;
+  return getCachedData();
 }
 
 //_____________________ WRITE FUNCTIONS (POST) _____________________
@@ -119,7 +129,7 @@ export async function saveCompletedWorkout(
     }
 
     if (data.success) {
-      revalidatePath(`/session/${workoutSlug}`);
+      revalidateTag(`user-${user.id}`);
       return { success: "Workout saved successfully" };
     } else {
       return { error: data.error || "Failed to save workout" };

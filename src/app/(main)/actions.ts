@@ -25,9 +25,6 @@ export async function getNextWorkout(): Promise<UpcomingWorkout> {
         user_uuid: user.id,
       });
 
-      console.log("getNextWorkout data:", data);
-      console.log("getNextWorkout user.id:", user.id);
-
       if (!data || data.length === 0) {
         return null;
       }

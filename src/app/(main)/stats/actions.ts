@@ -1,23 +1,35 @@
 // import { checkAuthentication } from "@/utils/helpers/helpers";
-import { createClient } from "@/utils/supabase/server";
+import { checkAuthentication } from "@/utils/helpers/helpers";
+import { createServiceClient } from "@/utils/supabase/service-client";
 import { getDay } from "date-fns";
+import { unstable_cache } from "next/cache";
 
 export async function getTotalCompletedWorkouts(): Promise<
   number | { error: string }
 > {
   {
-    const supabase = await createClient();
-    // const { supabase, user } = await checkAuthentication();
+    const { user } = await checkAuthentication();
 
-    const { count, error } = await supabase
-      .from("completed_workouts")
-      .select("user_id", { count: "exact" });
+    const getCachedData = unstable_cache(
+      async () => {
+        console.log("Fetching from Supabase...");
+        const supabase = await createServiceClient();
+        const { count, error } = await supabase
+          .from("completed_workouts")
+          .select("user_id", { count: "exact" })
+          .eq("user_id", user.id);
 
-    if (error) {
-      return { error: "Failed to load your completed workouts" };
-    }
+        if (error) {
+          return { error: "Failed to load your completed workouts" };
+        }
 
-    return count ? count : 0;
+        return count ? count : 0;
+      },
+      [`total-completed-workouts-${user.id}`],
+      { tags: [`user-${user.id}`], revalidate: 3600 },
+    );
+
+    return getCachedData();
   }
 }
 
@@ -29,157 +41,203 @@ type DayOfWeekCount = {
 export async function getUserDayOfWeekCounts(): Promise<
   DayOfWeekCount[] | { error: string }
 > {
-  const supabase = await createClient();
-  // const { supabase, user } = await checkAuthentication();
+  const { user } = await checkAuthentication();
 
-  // Fetch all completed workouts
-  const { data, error } = await supabase
-    .from("completed_workouts")
-    .select("completed_date");
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
 
-  if (error) {
-    console.error("Error fetching completed workouts:", error);
-    return { error: "Failed to load your day of week stats" };
-  }
+      // Fetch all completed workouts
+      const { data, error } = await supabase
+        .from("completed_workouts")
+        .select("completed_date")
+        .eq("user_id", user.id);
 
-  // Count workouts by day of week
-  const dayCounts: Record<number, number> = {};
-  for (const workout of data) {
-    if (!workout.completed_date) continue;
-    const dayIndex = getDay(new Date(workout.completed_date)); // 0 = Sunday
-    dayCounts[dayIndex] = (dayCounts[dayIndex] || 0) + 1;
-  }
+      if (error) {
+        console.error("Error fetching completed workouts:", error);
+        return { error: "Failed to load your day of week stats" };
+      }
 
-  // Ensure all days are represented (even if count is 0)
-  const results: DayOfWeekCount[] = Array.from({ length: 7 }, (_, i) => {
-    // i: 0 = Monday, ..., 6 = Sunday
-    const day = (i + 1) % 7; // 1 = Monday, ..., 0 = Sunday
-    return {
-      day,
-      count: dayCounts[day] || 0,
-    };
-  });
+      // Count workouts by day of week
+      const dayCounts: Record<number, number> = {};
+      for (const workout of data) {
+        if (!workout.completed_date) continue;
+        const dayIndex = getDay(new Date(workout.completed_date)); // 0 = Sunday
+        dayCounts[dayIndex] = (dayCounts[dayIndex] || 0) + 1;
+      }
 
-  return results;
+      // Ensure all days are represented (even if count is 0)
+      const results: DayOfWeekCount[] = Array.from({ length: 7 }, (_, i) => {
+        // i: 0 = Monday, ..., 6 = Sunday
+        const day = (i + 1) % 7; // 1 = Monday, ..., 0 = Sunday
+        return {
+          day,
+          count: dayCounts[day] || 0,
+        };
+      });
+
+      return results;
+    },
+    [`user-day-of-week-counts-${user.id}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+
+  return getCachedData();
 }
 
 export async function getUserBenchPressPR(): Promise<
   number | { error: string } | null
 > {
-  const supabase = await createClient();
-  // const { supabase, user } = await checkAuthentication();
-  const benchPressId = "e09e6102-0cd4-4b11-8774-4a7251b146a4";
+  const { user } = await checkAuthentication();
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
 
-  // Get all completed_exercise IDs for bench press
-  const { data: exercises, error: exercisesError } = await supabase
-    .from("completed_exercises")
-    .select("id")
-    .eq("exercise_id", benchPressId);
+      const benchPressId = "e09e6102-0cd4-4b11-8774-4a7251b146a4";
 
-  if (exercisesError) {
-    return { error: "Failed to load deadlift exercises." };
-  }
-  if (!exercises || exercises.length === 0) {
-    return null; // No PR yet
-  }
+      // Get all completed_exercise IDs for bench press
+      const { data: exercises, error: exercisesError } = await supabase
+        .from("completed_exercises")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("exercise_id", benchPressId);
 
-  const exerciseIds = exercises.map((ex: { id: string }) => ex.id);
+      if (exercisesError) {
+        return { error: "Failed to load bench press exercises." };
+      }
+      if (!exercises || exercises.length === 0) {
+        return null; // No PR yet
+      }
 
-  // Get the max weight from completed_sets for those exercises
-  const { data: sets, error: setsError } = await supabase
-    .from("completed_sets")
-    .select("weight")
-    .in("completed_exercise_id", exerciseIds)
-    .order("weight", { ascending: false })
-    .limit(1);
+      const exerciseIds = exercises.map((ex: { id: string }) => ex.id);
 
-  if (setsError) {
-    return { error: "Failed to load deadlift PR." };
-  }
-  if (!sets || sets.length === 0) {
-    return null; // No PR yet
-  }
+      // Get the max weight from completed_sets for those exercises
+      const { data: sets, error: setsError } = await supabase
+        .from("completed_sets")
+        .select("weight")
+        .in("completed_exercise_id", exerciseIds)
+        .order("weight", { ascending: false })
+        .limit(1);
 
-  return Number(sets[0].weight);
+      if (setsError) {
+        return { error: "Failed to load Bench Press PR." };
+      }
+      if (!sets || sets.length === 0) {
+        return null; // No PR yet
+      }
+
+      return Number(sets[0].weight);
+    },
+    [`user-bench-press-pr-${user.id}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+
+  return getCachedData();
 }
 
 // Squat PR
 export async function getUserSquatPR(): Promise<
   number | { error: string } | null
 > {
-  const supabase = await createClient();
-  // const { supabase, user } = await checkAuthentication();
-  const squatId = "8ec9d613-55e8-4598-b37b-7bb45ad0ab20";
+  const { user } = await checkAuthentication();
 
-  // Get all completed_exercise IDs for squat
-  const { data: exercises, error: exercisesError } = await supabase
-    .from("completed_exercises")
-    .select("id")
-    .eq("exercise_id", squatId);
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
 
-  if (exercisesError) {
-    return { error: "Failed to load deadlift exercises." };
-  }
-  if (!exercises || exercises.length === 0) {
-    return null; // No PR yet
-  }
+      const squatId = "8ec9d613-55e8-4598-b37b-7bb45ad0ab20";
 
-  const exerciseIds = exercises.map((ex: { id: string }) => ex.id);
+      // Get all completed_exercise IDs for squat
+      const { data: exercises, error: exercisesError } = await supabase
+        .from("completed_exercises")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("exercise_id", squatId);
 
-  // Get the max weight from completed_sets for those exercises
-  const { data: sets, error: setsError } = await supabase
-    .from("completed_sets")
-    .select("weight")
-    .in("completed_exercise_id", exerciseIds)
-    .order("weight", { ascending: false })
-    .limit(1);
-  if (setsError) {
-    return { error: "Failed to load deadlift PR." };
-  }
-  if (!sets || sets.length === 0) {
-    return null; // No PR yet
-  }
+      if (exercisesError) {
+        return { error: "Failed to load squat exercises." };
+      }
+      if (!exercises || exercises.length === 0) {
+        return null; // No PR yet
+      }
 
-  return Number(sets[0].weight);
+      const exerciseIds = exercises.map((ex: { id: string }) => ex.id);
+
+      // Get the max weight from completed_sets for those exercises
+      const { data: sets, error: setsError } = await supabase
+        .from("completed_sets")
+        .select("weight")
+        .in("completed_exercise_id", exerciseIds)
+        .order("weight", { ascending: false })
+        .limit(1);
+      if (setsError) {
+        return { error: "Failed to load Squat PR." };
+      }
+      if (!sets || sets.length === 0) {
+        return null; // No PR yet
+      }
+
+      return Number(sets[0].weight);
+    },
+    [`user-squat-pr-${user.id}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+
+  return getCachedData();
 }
 
 // Deadlift pr
 export async function getUserDeadliftPR(): Promise<
   number | { error: string } | null
 > {
-  const supabase = await createClient();
-  // const { supabase, user } = await checkAuthentication();
-  const deadliftId = "aa9ccfd3-d333-40cc-a3df-ad6d3ce5c800";
+  const { user } = await checkAuthentication();
 
-  // Get all completed_exercise IDs for deadlift
-  const { data: exercises, error: exercisesError } = await supabase
-    .from("completed_exercises")
-    .select("id")
-    .eq("exercise_id", deadliftId);
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
 
-  if (exercisesError) {
-    return { error: "Failed to load deadlift exercises." };
-  }
-  if (!exercises || exercises.length === 0) {
-    return null; // No PR yet
-  }
+      const deadliftId = "aa9ccfd3-d333-40cc-a3df-ad6d3ce5c800";
 
-  const exerciseIds = exercises.map((ex: { id: string }) => ex.id);
+      // Get all completed_exercise IDs for deadlift
+      const { data: exercises, error: exercisesError } = await supabase
+        .from("completed_exercises")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("exercise_id", deadliftId);
 
-  // Get the max weight from completed_sets for those exercises
-  const { data: sets, error: setsError } = await supabase
-    .from("completed_sets")
-    .select("weight")
-    .in("completed_exercise_id", exerciseIds)
-    .order("weight", { ascending: false })
-    .limit(1);
+      if (exercisesError) {
+        return { error: "Failed to load deadlift exercises." };
+      }
+      if (!exercises || exercises.length === 0) {
+        return null; // No PR yet
+      }
 
-  if (setsError) {
-    return { error: "Failed to load deadlift PR." };
-  }
-  if (!sets || sets.length === 0) {
-    return null; // No PR yet
-  }
+      const exerciseIds = exercises.map((ex: { id: string }) => ex.id);
 
-  return Number(sets[0].weight);
+      // Get the max weight from completed_sets for those exercises
+      const { data: sets, error: setsError } = await supabase
+        .from("completed_sets")
+        .select("weight")
+        .in("completed_exercise_id", exerciseIds)
+        .order("weight", { ascending: false })
+        .limit(1);
+
+      if (setsError) {
+        return { error: "Failed to load deadlift PR." };
+      }
+      if (!sets || sets.length === 0) {
+        return null; // No PR yet
+      }
+
+      return Number(sets[0].weight);
+    },
+    [`user-deadlift-pr-${user.id}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+
+  return getCachedData();
 }

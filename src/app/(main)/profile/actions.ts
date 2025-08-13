@@ -2,29 +2,41 @@
 import { CompletedWorkout, InitialState } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
-import { revalidatePath } from "next/cache";
+import { createServiceClient } from "@/utils/supabase/service-client";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
 
 // Function to get the users goal
 export async function getUserGoal() {
   try {
-    const supabase = await createClient();
-    // const { supabase, user } = await checkAuthentication();
+    const { user } = await checkAuthentication();
 
-    const { data, error } = await supabase
-      .from("user_settings")
-      .select("workout_goal_per_week")
-      .single();
+    const getCachedData = unstable_cache(
+      async () => {
+        console.log("Fetching from Supabase...");
+        const supabase = await createServiceClient();
 
-    if (error) {
-      return { error: "Failed to load user goal" };
-    }
+        const { data, error } = await supabase
+          .from("user_settings")
+          .select("workout_goal_per_week")
+          .eq("id", user.id)
+          .single();
 
-    if (!data) {
-      return { error: "No goal set." };
-    }
+        if (error) {
+          return { error: "Failed to load user goal" };
+        }
 
-    return data;
+        if (!data) {
+          return { error: "No goal set." };
+        }
+
+        return data;
+      },
+      [`user-goal-${user.id}`],
+      { tags: [`user-${user.id}`], revalidate: 3600 },
+    );
+
+    return getCachedData();
   } catch (err) {
     console.error("Error fetching user goal:", err);
     return { error: "An unexpected error occurred" };
@@ -55,7 +67,7 @@ export async function updateUserGoal(
     return { error: "Failed to update user goal" };
   }
 
-  revalidatePath("/profile");
+  revalidateTag(`user-${user.id}`);
 
   return { success: true };
 }
@@ -77,12 +89,17 @@ export async function signOut() {
 export async function getWorkoutHistory(
   planSlug: string,
 ): Promise<CompletedWorkout[] | { error: string }> {
-  const supabase = await createClient();
+  const { user } = await checkAuthentication();
 
-  const { data, error } = await supabase
-    .from("completed_workouts")
-    .select(
-      `
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
+
+      const { data, error } = await supabase
+        .from("completed_workouts")
+        .select(
+          `
       id,
       user_id,
       workout_id,
@@ -117,35 +134,52 @@ export async function getWorkoutHistory(
         )
       )
     `,
-    )
-    .eq("workouts.workout_plans.slug", planSlug)
-    .order("completed_at", { ascending: false })
-    .order("saved_at", {
-      referencedTable: "completed_exercises",
-      ascending: false,
-    });
+        )
+        .eq("workouts.workout_plans.slug", planSlug)
+        .eq("user_id", user.id)
+        .order("completed_at", { ascending: false })
+        .order("saved_at", {
+          referencedTable: "completed_exercises",
+          ascending: false,
+        });
 
-  if (error) {
-    console.error("Error fetching workout history:", error);
-    return { error: "Failed to load workout history" };
-  }
+      if (error) {
+        console.error("Error fetching workout history:", error);
+        return { error: "Failed to load workout history" };
+      }
 
-  return data as unknown as CompletedWorkout[];
+      return data as unknown as CompletedWorkout[];
+    },
+    [`workout-history-${planSlug}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+  return getCachedData();
 }
 
 // Function to get the user's workout plans
 export async function getAllPlans() {
-  const supabase = await createClient();
+  const { user } = await checkAuthentication();
 
-  const { data, error } = await supabase
-    .from("workout_plans")
-    .select("id, name, slug, is_active, deleted_at")
-    .order("created_at", { ascending: false });
+  const getCachedData = unstable_cache(
+    async () => {
+      console.log("Fetching from Supabase...");
+      const supabase = await createServiceClient();
 
-  if (error) {
-    console.error("Error fetching workout plans:", error);
-    return { error: "Failed to load workout plans" };
-  }
+      const { data, error } = await supabase
+        .from("workout_plans")
+        .select("id, name, slug, is_active, deleted_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
-  return data || [];
+      if (error) {
+        console.error("Error fetching workout plans:", error);
+        return { error: "Failed to load workout plans" };
+      }
+
+      return data || [];
+    },
+    [`workout-plans-${user.id}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+  return getCachedData();
 }
