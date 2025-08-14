@@ -78,8 +78,8 @@ export async function saveCompletedExercise(
       }))
       .filter((set) => set.reps > 0);
 
-    if (setsData.length === 0) {
-      return { error: "Please fill in reps for at least one set" };
+    if (setsData.length === 0 && !notes) {
+      return { error: "Please fill in reps for at least one set or add notes" };
     }
 
     // Call RPC function
