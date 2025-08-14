@@ -40,20 +40,20 @@ export default function CurrentExerciseCard({
   return (
     <>
       <div className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md">
-        <div className="flex h-full items-center justify-between p-4">
-          <div className="flex items-center justify-center gap-4">
-            <h3 className="text-lg font-semibold">{exercise.exercise.name}</h3>
+        <div className="flex h-full items-center justify-between gap-4 px-3 py-4">
+          <div className="flex w-full items-center justify-between gap-4">
+            <h3 className="font-semibold">{exercise.exercise.name}</h3>
             {isCompleted && !workoutCompleted && (
               <div className="flex items-center gap-2">
-                <span className="rounded-full bg-green-500 px-2 py-1 text-xs text-white">
-                  ✓ Saved
+                <span className="rounded-full bg-green-500 px-2 py-1 text-[10px] text-white">
+                  Saved
                 </span>
               </div>
             )}
             {workoutCompleted && (
               <div className="flex items-center gap-2">
-                <span className="bg-foreground/50 rounded-full px-2 py-1 text-xs text-white">
-                  ✓ Saved
+                <span className="bg-foreground/50 rounded-full px-2 py-1 text-[10px] text-white">
+                  Saved
                 </span>
               </div>
             )}
