@@ -67,6 +67,11 @@ export default function CompletedExerciseCard({
                       </div>
                     ))}
                   </div>
+                  {ex.notes && (
+                    <p className="text-foreground/50 text-sm italic">
+                      Notes: {ex.notes}
+                    </p>
+                  )}
                 </div>
               ))}
             </motion.div>
