@@ -94,6 +94,7 @@ export async function saveCompletedExercise(
 
     if (data?.success) {
       revalidatePath(`/session/${workoutSlug}`);
+      revalidateTag(`user-${user.id}`);
       return { success: data.message };
     } else {
       return { error: data?.error || "Failed to save exercise" };
@@ -129,6 +130,7 @@ export async function saveCompletedWorkout(
     }
 
     if (data.success) {
+      revalidatePath(`/session/${workoutSlug}`);
       revalidateTag(`user-${user.id}`);
       return { success: "Workout saved successfully" };
     } else {
