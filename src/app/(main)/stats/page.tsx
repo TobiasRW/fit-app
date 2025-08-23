@@ -225,7 +225,7 @@ async function StreakSquare() {
       <p className="text-lg">Week streak</p>
       <p className="text-5xl">{streak.streak}</p>
       <p className="text-3xl">
-        {streak?.streak && streak.streak > 0 ? "🔥" : "❄️"}
+        {streak?.streak && streak.streak > 0 ? "🔥" : "😴"}
       </p>
     </div>
   );

@@ -39,7 +39,10 @@ export default function CurrentExerciseCard({
 
   return (
     <>
-      <div className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md">
+      <div
+        className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md"
+        onClick={() => setIsOpen(!isOpen)}
+      >
         <div className="flex h-full items-center justify-between gap-4 px-3 py-4">
           <div className="flex w-full items-center justify-between gap-4">
             <h3 className="font-semibold">{exercise.exercise.name}</h3>
@@ -61,7 +64,6 @@ export default function CurrentExerciseCard({
           <CaretDownIcon
             size={24}
             className={`transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}
-            onClick={() => setIsOpen(!isOpen)}
           />
         </div>
         <AnimatePresence>

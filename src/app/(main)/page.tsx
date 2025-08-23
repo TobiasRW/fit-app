@@ -176,7 +176,7 @@ async function WeekStreak({ streak }: { streak?: Streak }) {
   return (
     <div className="">
       <p className="text-foreground text-center text-6xl font-medium">
-        {streak?.streak && streak.streak > 0 ? "🔥" : "❄️"}
+        {streak?.streak && streak.streak > 0 ? "🔥" : "😴"}
       </p>
       <p className="text-foreground text-sm font-light">
         <span className="text-base font-bold">{streak?.streak} </span>Week
