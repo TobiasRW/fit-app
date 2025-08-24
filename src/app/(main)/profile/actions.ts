@@ -140,7 +140,7 @@ export async function getWorkoutHistory(
         .order("completed_at", { ascending: false })
         .order("saved_at", {
           referencedTable: "completed_exercises",
-          ascending: false,
+          ascending: true,
         });
 
       if (error) {

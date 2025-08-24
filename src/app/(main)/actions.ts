@@ -104,7 +104,7 @@ export async function getWeeklyCompletedWorkouts(): Promise<
         .gte("completed_at", weekStart)
         .lte("completed_at", weekEnd)
         .eq("user_id", user.id)
-        .order("completed_at", { ascending: true })
+        .order("completed_at", { ascending: false })
         .order("saved_at", {
           referencedTable: "completed_exercises",
           ascending: true,
