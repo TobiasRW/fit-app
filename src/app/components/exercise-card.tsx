@@ -27,11 +27,11 @@ export default function ExerciseCard({
 
   return (
     <>
-      <div
-        className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <div className="flex items-center justify-between p-4">
+      <div className="bg-gray dark:bg-dark-gray my-4 rounded-lg drop-shadow-md">
+        <div
+          className="flex items-center justify-between p-4"
+          onClick={() => setIsOpen(!isOpen)}
+        >
           <div className="flex flex-col">
             <h3 className="text-xl font-semibold">
               {exercise.exercises?.name || "Exercise name not found"}

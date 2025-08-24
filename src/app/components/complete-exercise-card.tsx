@@ -25,11 +25,11 @@ export default function CompletedExerciseCard({
 
   return (
     <>
-      <div
-        className="bg-gray dark:bg-dark-gray gap-2 rounded-lg shadow-md"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <div className="flex w-full items-center justify-between px-2 py-3">
+      <div className="bg-gray dark:bg-dark-gray gap-2 rounded-lg shadow-md">
+        <div
+          className="flex w-full items-center justify-between px-2 py-3"
+          onClick={() => setIsOpen(!isOpen)}
+        >
           <div className="flex items-center gap-2">
             <p className="font-medium">{formatDate(exercise.completed_date)}</p>
             <span> - </span>
