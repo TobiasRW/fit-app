@@ -166,23 +166,38 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
         weekCounts[key] = (weekCounts[key] || 0) + 1;
       }
 
-      // 4. Start from current week, walk backward
+      // 4. Start from current week, but only count if goal is met
       let streak = 0;
-      const datePointer = startOfISOWeek(new Date());
+      const now = new Date();
+      const datePointer = startOfISOWeek(now);
 
       while (true) {
         const week = getISOWeek(datePointer);
         const year = getYear(datePointer);
         const key = `${year}-${week}`;
+        const weekCount = weekCounts[key] || 0;
 
-        if ((weekCounts[key] || 0) >= goal) {
+        if (weekCount >= goal) {
           streak++;
           // move back a week
           datePointer.setDate(datePointer.getDate() - 7);
         } else {
-          break;
+          // If this is the current week and goal isn't met yet, don't break the streak
+          // Only break if it's a past week that didn't meet the goal
+          const isCurrentWeek =
+            getISOWeek(now) === week && getYear(now) === year;
+
+          if (isCurrentWeek) {
+            // Current week doesn't meet goal yet, but don't break - check previous weeks
+            datePointer.setDate(datePointer.getDate() - 7);
+            continue;
+          } else {
+            // Past week didn't meet goal, break the streak
+            break;
+          }
         }
       }
+
       return { streak, goal };
     },
     [`user-week-streak-${user.id}`],
