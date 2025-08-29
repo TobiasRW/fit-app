@@ -1,14 +1,9 @@
 "use server";
-import {
-  CompletedWorkout,
-  InitialState,
-  UserGoal,
-  WorkoutExercise,
-} from "@/app/types";
+import { CompletedWorkout, InitialState, UserGoal } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { createServiceClient } from "@/utils/supabase/service-client";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
 
 // Function to get the users goal
@@ -18,7 +13,6 @@ export async function getUserGoal(): Promise<UserGoal | { error: string }> {
 
     const getCachedData = unstable_cache(
       async () => {
-        console.log("Fetching from Supabase...");
         const supabase = await createServiceClient();
 
         const { data, error } = await supabase
@@ -28,7 +22,7 @@ export async function getUserGoal(): Promise<UserGoal | { error: string }> {
           .single();
 
         if (error) {
-          return { error: "Failed to load user goal" };
+          return { error: "Failed to load your goal" };
         }
 
         if (!data) {
@@ -38,7 +32,7 @@ export async function getUserGoal(): Promise<UserGoal | { error: string }> {
         return data;
       },
       [`user-goal-${user.id}`],
-      { tags: [`user-${user.id}`], revalidate: 3600 },
+      { tags: [`user-${user.id}`, `${user.id}-goal`], revalidate: 3600 },
     );
 
     return getCachedData();
@@ -98,7 +92,6 @@ export async function getWorkoutHistory(
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const { data, error } = await supabase
@@ -156,7 +149,7 @@ export async function getWorkoutHistory(
       return data as unknown as CompletedWorkout[];
     },
     [`workout-history-${planSlug}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-history`], revalidate: 3600 },
   );
   return getCachedData();
 }
@@ -167,7 +160,6 @@ export async function getAllPlans() {
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const { data, error } = await supabase
@@ -184,7 +176,7 @@ export async function getAllPlans() {
       return data || [];
     },
     [`workout-plans-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-workout-plans`], revalidate: 3600 },
   );
   return getCachedData();
 }

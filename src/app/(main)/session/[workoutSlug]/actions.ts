@@ -15,7 +15,6 @@ export async function getCurrentWorkout(
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
       const { data, error } = await supabase.rpc(
         "get_workout_with_last_performance",
@@ -42,7 +41,7 @@ export async function getCurrentWorkout(
       return data;
     },
     [`current-workout-${workoutSlug}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-current-workout`] },
   );
 
   return getCachedData();

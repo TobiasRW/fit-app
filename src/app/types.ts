@@ -129,5 +129,4 @@ export type UserGoal = {
 export type Streak = {
   error?: string | undefined;
   streak?: number | undefined;
-  // goal?: number | undefined;
 };

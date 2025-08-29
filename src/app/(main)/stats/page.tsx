@@ -12,9 +12,9 @@ import {
 import ErrorCard from "@/app/components/error-card";
 
 const prDefinitions = [
-  { name: "Bench Press", fetch: getUserBenchPressPR },
-  { name: "Squat", fetch: getUserSquatPR },
-  { name: "Deadlift", fetch: getUserDeadliftPR },
+  { name: "Bench Press", fetch: getUserBenchPressPR, tag: "bench-press-pr" },
+  { name: "Squat", fetch: getUserSquatPR, tag: "squat-pr" },
+  { name: "Deadlift", fetch: getUserDeadliftPR, tag: "deadlift-pr" },
 ];
 
 export default async function Page() {
@@ -55,7 +55,7 @@ export default async function Page() {
           <div className="mt-4 flex items-center justify-between gap-4">
             {prDefinitions.map((def) => (
               <Suspense key={def.name} fallback={<LoadingPR />}>
-                <PRCard name={def.name} fetch={def.fetch} />
+                <PRCard name={def.name} fetch={def.fetch} tag={def.tag} />
               </Suspense>
             ))}
           </div>
@@ -68,16 +68,22 @@ export default async function Page() {
 async function PRCard({
   name,
   fetch,
+  tag,
 }: {
   name: string;
   fetch: () => Promise<number | { error: string } | null>;
+  tag: string;
 }) {
   const pr = await fetch();
 
   if (typeof pr === "object" && pr !== null && "error" in pr) {
     return (
       <div className="h-26 w-full">
-        <ErrorCard errorText={"Failed to Load PR"} variant="secondary" />
+        <ErrorCard
+          errorText={"Failed to Load PR"}
+          variant="secondary"
+          tag={tag}
+        />
       </div>
     );
   }
@@ -138,7 +144,11 @@ async function BarChart() {
   if (!Array.isArray(dayCounts)) {
     return (
       <div className="mt-10 h-40 w-full">
-        <ErrorCard errorText={dayCounts.error} variant="secondary" />
+        <ErrorCard
+          errorText={dayCounts.error}
+          variant="secondary"
+          tag="day-percentages"
+        />
       </div>
     );
   }
@@ -199,6 +209,7 @@ async function TotalSquare() {
         <ErrorCard
           errorText={totalWorkouts.error ?? "An unknown error occurred."}
           variant="secondary"
+          tag="total-completed-workouts"
         />
       </div>
     );
@@ -221,6 +232,7 @@ async function StreakSquare() {
         <ErrorCard
           errorText={streak.error ?? "An unknown error occurred."}
           variant="secondary"
+          tag="current-streak"
         />
       </div>
     );
@@ -242,10 +254,11 @@ async function LongestStreak() {
 
   if ("error" in streak) {
     return (
-      <div className="">
+      <div className="h-20 w-full">
         <ErrorCard
           errorText={streak.error ?? "An unknown error occurred."}
-          variant="primary"
+          variant="secondary"
+          tag="longest-streak"
         />
       </div>
     );

@@ -34,7 +34,11 @@ async function CompletedExercises({ planSlug }: { planSlug: string }) {
   if ("error" in workoutHistory) {
     return (
       <div className="mt-8 h-26">
-        <ErrorCard errorText={workoutHistory.error} variant="secondary" />
+        <ErrorCard
+          errorText={workoutHistory.error}
+          variant="secondary"
+          tag="history"
+        />
       </div>
     );
   }

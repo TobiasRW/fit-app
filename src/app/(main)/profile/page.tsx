@@ -5,6 +5,7 @@ import EditGoalModal from "@/app/components/modals/edit-goal-modal";
 import Button from "@/app/components/ui/button";
 import { Suspense } from "react";
 import Link from "next/link";
+import ErrorCard from "@/app/components/error-card";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -50,9 +51,9 @@ async function GoalSection() {
 
   if ("error" in goal) {
     return (
-      <p className="text-center text-red-500">
-        {goal.error}, please try again later.
-      </p>
+      <div className="h-20">
+        <ErrorCard errorText={goal.error} variant="secondary" tag="goal" />
+      </div>
     );
   }
 

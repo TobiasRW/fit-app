@@ -9,7 +9,7 @@ import {
   startOfISOWeek,
 } from "date-fns";
 import { checkAuthentication } from "@/utils/helpers/helpers";
-import { unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import { createServiceClient } from "@/utils/supabase/service-client";
 
 export async function getNextWorkout(): Promise<UpcomingWorkout> {
@@ -18,7 +18,6 @@ export async function getNextWorkout(): Promise<UpcomingWorkout> {
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
       // Update get_upcoming_workout function to take user_id as a parameter
       const { data, error } = await supabase.rpc("get_next_workout", {
@@ -46,7 +45,7 @@ export async function getNextWorkout(): Promise<UpcomingWorkout> {
       };
     },
     [`next-workout-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-next-workout`], revalidate: 3600 },
   );
 
   return getCachedData();
@@ -62,7 +61,6 @@ export async function getWeeklyCompletedWorkouts(): Promise<
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const weekStart = startOfWeek(new Date(), {
         weekStartsOn: 1,
       }).toISOString();
@@ -118,7 +116,10 @@ export async function getWeeklyCompletedWorkouts(): Promise<
       return data as unknown as CompletedWorkout[];
     },
     [`weekly-completed-workouts-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    {
+      tags: [`user-${user.id}`, `${user.id}-weekly-completed-workouts`],
+      revalidate: 3600,
+    },
   );
 
   return getCachedData();
@@ -131,7 +132,6 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       // 1. Get goal
       const { data: settings, error: settingsError } = await supabase
         .from("user_settings")
@@ -205,4 +205,11 @@ export async function getUserWeekStreak(): Promise<Streak | { error: string }> {
   );
 
   return getCachedData();
+}
+
+// Function to revalidate user data
+export async function revalidateCache(tag: string) {
+  const { user } = await checkAuthentication();
+
+  revalidateTag(`${user.id}-${tag}`);
 }

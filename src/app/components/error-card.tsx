@@ -2,29 +2,33 @@
 
 import Image from "next/image";
 import Button from "./ui/button";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { revalidateCache } from "../(main)/actions";
+import { useState } from "react";
 
 export default function ErrorCard({
   errorText,
   variant,
+  tag,
 }: {
   errorText: string;
   variant: "primary" | "secondary";
+  tag: string;
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [pending, setPending] = useState(false);
 
-  const handleRefresh = () => {
-    startTransition(() => {
-      router.refresh();
-    });
+  const handleRefresh = async () => {
+    setPending(true);
+    try {
+      await revalidateCache(tag);
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
     <>
       <div
-        className={`bg-faded-red flex flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md ${isPending ? "animate-pulse opacity-50" : ""} ${variant === "primary" ? "h-26" : "h-full w-full"}`}
+        className={`bg-faded-red flex flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md ${pending ? "animate-pulse opacity-50" : ""} ${variant === "primary" ? "h-26" : "h-full w-full"}`}
       >
         {/* Text positioned in center of entire card */}
         <div className="absolute inset-0 z-20 flex flex-col justify-center px-4">

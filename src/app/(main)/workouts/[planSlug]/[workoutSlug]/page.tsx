@@ -49,7 +49,11 @@ async function WorkoutContent({
           <h1 className="text-4xl font-bold">Workout not found</h1>
         </div>
         <div className="mt-8 h-26">
-          <ErrorCard errorText={workout.error} variant="secondary" />
+          <ErrorCard
+            errorText={workout.error}
+            variant="secondary"
+            tag="workout"
+          />
         </div>
       </>
     );
@@ -60,7 +64,11 @@ async function WorkoutContent({
   if ("error" in exercises) {
     return (
       <div className="mt-8 h-26">
-        <ErrorCard errorText={exercises.error} variant="secondary" />
+        <ErrorCard
+          errorText={exercises.error}
+          variant="secondary"
+          tag="exercises"
+        />
       </div>
     );
   }

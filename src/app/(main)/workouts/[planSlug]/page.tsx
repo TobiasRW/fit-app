@@ -38,7 +38,11 @@ async function WorkoutPlanContent({ planSlug }: { planSlug: string }) {
           <h1 className="text-4xl font-bold">Plan not found</h1>
         </div>
         <div className="mt-8">
-          <ErrorCard errorText={workoutPlan.error} variant="primary" />
+          <ErrorCard
+            errorText={workoutPlan.error}
+            variant="primary"
+            tag="workout-plan"
+          />
         </div>
       </>
     );

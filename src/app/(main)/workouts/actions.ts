@@ -15,7 +15,6 @@ export async function getUserWorkoutPlans() {
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const { data: workoutPlans, error } = await supabase
@@ -32,7 +31,7 @@ export async function getUserWorkoutPlans() {
       return workoutPlans || [];
     },
     [`user-workout-plans-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-workout-plans`], revalidate: 3600 },
   );
 
   return getCachedData();
@@ -44,7 +43,6 @@ export async function getWorkoutPlan(slug: string) {
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const { data: workoutPlan, error } = await supabase
@@ -79,7 +77,7 @@ export async function getWorkoutPlan(slug: string) {
       return workoutPlan;
     },
     [`workout-plan-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-workout-plan`], revalidate: 3600 },
   );
 
   return getCachedData();
@@ -93,7 +91,6 @@ export async function getWorkoutFromPlan(
   const { user } = await checkAuthentication();
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const { data: workout, error } = await supabase
@@ -123,7 +120,7 @@ export async function getWorkoutFromPlan(
       return workout;
     },
     [`workout-${planSlug}-${workoutSlug}-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-workout`], revalidate: 3600 },
   );
 
   return getCachedData();
@@ -135,7 +132,6 @@ export async function getExercisesFromWorkout(workoutId: string) {
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const { data: workoutExercises, error } = await supabase
@@ -182,7 +178,7 @@ export async function getExercisesFromWorkout(workoutId: string) {
       );
     },
     [`workout-exercises-${workoutId}-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-exercises`], revalidate: 3600 },
   );
 
   return getCachedData();

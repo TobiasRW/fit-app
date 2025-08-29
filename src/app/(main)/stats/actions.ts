@@ -13,8 +13,8 @@ export async function getTotalCompletedWorkouts(): Promise<
 
     const getCachedData = unstable_cache(
       async () => {
-        console.log("Fetching from Supabase...");
         const supabase = await createServiceClient();
+
         const { count, error } = await supabase
           .from("completed_workouts")
           .select("user_id", { count: "exact" })
@@ -27,7 +27,10 @@ export async function getTotalCompletedWorkouts(): Promise<
         return count ? count : 0;
       },
       [`total-completed-workouts-${user.id}`],
-      { tags: [`user-${user.id}`], revalidate: 3600 },
+      {
+        tags: [`user-${user.id}`, `${user.id}-total-completed-workouts`],
+        revalidate: 3600,
+      },
     );
 
     return getCachedData();
@@ -46,8 +49,12 @@ export async function getUserDayOfWeekCounts(): Promise<
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
+
+      // timeout to simulate error 50% of the time
+      if (Math.random() < 0.5) {
+        return { streak: 0, error: "Failed to load current streak" };
+      }
 
       // Fetch all completed workouts
       const { data, error } = await supabase
@@ -81,7 +88,10 @@ export async function getUserDayOfWeekCounts(): Promise<
       return results;
     },
     [`user-day-of-week-counts-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    {
+      tags: [`user-${user.id}`, `${user.id}-day-percentages`],
+      revalidate: 3600,
+    },
   );
 
   return getCachedData();
@@ -126,7 +136,10 @@ export async function getLongestStreak(): Promise<Streak> {
       return { streak: data || 0 };
     },
     [`user-longest-streak-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    {
+      tags: [`user-${user.id}`, `${user.id}-longest-streak`],
+      revalidate: 3600,
+    },
   );
 
   return getCachedData();
@@ -138,7 +151,6 @@ export async function getUserBenchPressPR(): Promise<
   const { user } = await checkAuthentication();
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const benchPressId = "e09e6102-0cd4-4b11-8774-4a7251b146a4";
@@ -177,7 +189,10 @@ export async function getUserBenchPressPR(): Promise<
       return Number(sets[0].weight);
     },
     [`user-bench-press-pr-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    {
+      tags: [`user-${user.id}`, `${user.id}-bench-press-pr`],
+      revalidate: 3600,
+    },
   );
 
   return getCachedData();
@@ -191,7 +206,6 @@ export async function getUserSquatPR(): Promise<
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const squatId = "8ec9d613-55e8-4598-b37b-7bb45ad0ab20";
@@ -229,7 +243,7 @@ export async function getUserSquatPR(): Promise<
       return Number(sets[0].weight);
     },
     [`user-squat-pr-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-squat-pr`], revalidate: 3600 },
   );
 
   return getCachedData();
@@ -243,7 +257,6 @@ export async function getUserDeadliftPR(): Promise<
 
   const getCachedData = unstable_cache(
     async () => {
-      console.log("Fetching from Supabase...");
       const supabase = await createServiceClient();
 
       const deadliftId = "aa9ccfd3-d333-40cc-a3df-ad6d3ce5c800";
@@ -282,7 +295,7 @@ export async function getUserDeadliftPR(): Promise<
       return Number(sets[0].weight);
     },
     [`user-deadlift-pr-${user.id}`],
-    { tags: [`user-${user.id}`], revalidate: 3600 },
+    { tags: [`user-${user.id}`, `${user.id}-deadlift-pr`], revalidate: 3600 },
   );
 
   return getCachedData();
