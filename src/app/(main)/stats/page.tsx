@@ -110,6 +110,7 @@ async function WorkoutYearCompletion() {
         <ErrorCard
           errorText={"Failed to load your total workouts completed"}
           variant="secondary"
+          tag="total-completed-workouts"
         />
       </div>
     );
@@ -117,7 +118,11 @@ async function WorkoutYearCompletion() {
   if ("error" in goal) {
     return (
       <div className="mt-10 h-24 w-full">
-        <ErrorCard errorText={"Failed to load your goal"} variant="secondary" />
+        <ErrorCard
+          errorText={"Failed to load your goal"}
+          variant="secondary"
+          tag="goal"
+        />
       </div>
     );
   }
