@@ -94,7 +94,7 @@ export async function getCurrentStreak(): Promise<Streak> {
     async () => {
       const supabase = await createServiceClient();
 
-      const { data, error } = await supabase.rpc("get_current_strea", {
+      const { data, error } = await supabase.rpc("get_current_streak", {
         user_id_param: user.id,
       });
 
