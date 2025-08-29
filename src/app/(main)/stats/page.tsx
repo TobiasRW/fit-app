@@ -1,7 +1,8 @@
 import { Suspense } from "react";
-import { getUserWeekStreak } from "../actions";
 import { getUserGoal } from "../profile/actions";
 import {
+  getCurrentStreak,
+  getLongestStreak,
   getTotalCompletedWorkouts,
   getUserBenchPressPR,
   getUserDayOfWeekCounts,
@@ -23,12 +24,17 @@ export default async function Page() {
         <h1 className="text-4xl font-bold">Your Stats</h1>
 
         <section className="mt-6">
-          <div className="flex justify-between">
-            <Suspense fallback={<LoadingTotalSquare />}>
-              <TotalSquare />
-            </Suspense>
-            <Suspense fallback={<LoadingStreakSquare />}>
-              <StreakSquare />
+          <div className="flex flex-col gap-6">
+            <div className="flex gap-6">
+              <Suspense fallback={<LoadingTotalSquare />}>
+                <TotalSquare />
+              </Suspense>
+              <Suspense fallback={<LoadingStreakSquare />}>
+                <StreakSquare />
+              </Suspense>
+            </div>
+            <Suspense fallback={<LoadingLongestStreak />}>
+              <LongestStreak />
             </Suspense>
           </div>
           <Suspense fallback={<LoadingBarChart />}>
@@ -70,14 +76,14 @@ async function PRCard({
 
   if (typeof pr === "object" && pr !== null && "error" in pr) {
     return (
-      <div className="h-26 w-26">
+      <div className="h-26 w-full">
         <ErrorCard errorText={"Failed to Load PR"} variant="secondary" />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-26 w-26 flex-col items-center justify-between rounded-lg p-2 shadow-lg">
+    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-26 w-full flex-col items-center justify-between rounded-lg p-2 shadow-lg">
       <div className="justify-center text-center">
         <p className="mb-4 text-sm">{name}</p>
         <p className={`text-4xl ${!pr ? "text-lg" : ""}`}>
@@ -189,7 +195,7 @@ async function TotalSquare() {
     "error" in totalWorkouts
   ) {
     return (
-      <div className="h-40 w-40">
+      <div className="h-40 w-full">
         <ErrorCard
           errorText={totalWorkouts.error ?? "An unknown error occurred."}
           variant="secondary"
@@ -198,7 +204,7 @@ async function TotalSquare() {
     );
   }
   return (
-    <div className="bg-green flex h-40 w-40 flex-col items-center justify-between rounded-lg p-2 text-white shadow-lg">
+    <div className="bg-green flex h-40 w-full flex-col items-center justify-between rounded-lg p-2 text-white shadow-lg">
       <p className="text-lg">Total Workouts</p>
       <p className="text-6xl">{totalWorkouts.toString() || "0"}</p>
       <p className="text-3xl">💪</p>
@@ -207,11 +213,11 @@ async function TotalSquare() {
 }
 
 async function StreakSquare() {
-  const streak = await getUserWeekStreak();
+  const streak = await getCurrentStreak();
 
   if ("error" in streak) {
     return (
-      <div className="h-40 w-40">
+      <div className="h-40 w-full">
         <ErrorCard
           errorText={streak.error ?? "An unknown error occurred."}
           variant="secondary"
@@ -221,7 +227,7 @@ async function StreakSquare() {
   }
 
   return (
-    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-40 w-40 flex-col items-center justify-between rounded-lg p-2 shadow-lg">
+    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-40 w-full flex-col items-center justify-between rounded-lg p-2 shadow-lg">
       <p className="text-lg">Week streak</p>
       <p className="text-5xl">{streak.streak}</p>
       <p className="text-3xl">
@@ -231,20 +237,55 @@ async function StreakSquare() {
   );
 }
 
+async function LongestStreak() {
+  const streak = await getLongestStreak();
+
+  if ("error" in streak) {
+    return (
+      <div className="">
+        <ErrorCard
+          errorText={streak.error ?? "An unknown error occurred."}
+          variant="primary"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-14 items-center justify-between rounded-lg px-4 shadow-lg">
+      <p className="text-lg">Longest Streak: </p>
+      <p className="text-3xl">
+        {streak.streak}{" "}
+        <span className="ml-2">
+          {streak?.streak && streak.streak > 0 ? "🏆" : "😴"}
+        </span>
+      </p>
+    </div>
+  );
+}
+
+function LoadingLongestStreak() {
+  return (
+    <div className="bg-gray/50 dark:bg-dark-gray/50 h-14 w-full animate-pulse rounded-lg" />
+  );
+}
+
 function LoadingPR() {
   return (
-    <div className="bg-gray/50 dark:bg-dark-gray/50 h-26 w-26 animate-pulse rounded-lg" />
+    <div className="bg-gray/50 dark:bg-dark-gray/50 h-26 w-full animate-pulse rounded-lg" />
   );
 }
 
 function LoadingStreakSquare() {
   return (
-    <div className="bg-gray/50 dark:bg-dark-gray/50 h-40 w-40 animate-pulse rounded-lg" />
+    <div className="bg-gray/50 dark:bg-dark-gray/50 h-40 w-full animate-pulse rounded-lg" />
   );
 }
 
 function LoadingTotalSquare() {
-  return <div className="bg-faded-green h-40 w-40 animate-pulse rounded-lg" />;
+  return (
+    <div className="bg-faded-green h-40 w-full animate-pulse rounded-lg" />
+  );
 }
 
 function LoadingBarChart() {

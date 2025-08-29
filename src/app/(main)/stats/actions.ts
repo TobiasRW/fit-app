@@ -1,4 +1,5 @@
 // import { checkAuthentication } from "@/utils/helpers/helpers";
+import { Streak } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createServiceClient } from "@/utils/supabase/service-client";
 import { getDay } from "date-fns";
@@ -80,6 +81,51 @@ export async function getUserDayOfWeekCounts(): Promise<
       return results;
     },
     [`user-day-of-week-counts-${user.id}`],
+    { tags: [`user-${user.id}`], revalidate: 3600 },
+  );
+
+  return getCachedData();
+}
+
+// Get current streak
+export async function getCurrentStreak(): Promise<Streak> {
+  const { user } = await checkAuthentication();
+  const getCachedData = unstable_cache(
+    async () => {
+      const supabase = await createServiceClient();
+
+      const { data, error } = await supabase.rpc("get_current_strea", {
+        user_id_param: user.id,
+      });
+
+      if (error) return { streak: 0, error: "Failed to load current streak" };
+      return { streak: data || 0 };
+    },
+    [`user-current-streak-${user.id}`],
+    {
+      tags: [`user-${user.id}`, `${user.id}-current-streak`],
+      revalidate: 3600,
+    },
+  );
+
+  return getCachedData();
+}
+
+// Get longest streak
+export async function getLongestStreak(): Promise<Streak> {
+  const { user } = await checkAuthentication();
+  const getCachedData = unstable_cache(
+    async () => {
+      const supabase = await createServiceClient();
+
+      const { data, error } = await supabase.rpc("get_longest_streak", {
+        user_id_param: user.id,
+      });
+
+      if (error) return { streak: 0, error: "Failed to load longest streak" };
+      return { streak: data || 0 };
+    },
+    [`user-longest-streak-${user.id}`],
     { tags: [`user-${user.id}`], revalidate: 3600 },
   );
 

@@ -1,5 +1,10 @@
 "use server";
-import { CompletedWorkout, InitialState } from "@/app/types";
+import {
+  CompletedWorkout,
+  InitialState,
+  UserGoal,
+  WorkoutExercise,
+} from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { createServiceClient } from "@/utils/supabase/service-client";
@@ -7,7 +12,7 @@ import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
 
 // Function to get the users goal
-export async function getUserGoal() {
+export async function getUserGoal(): Promise<UserGoal | { error: string }> {
   try {
     const { user } = await checkAuthentication();
 

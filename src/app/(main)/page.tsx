@@ -1,9 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import {
-  getNextWorkout,
-  getUserWeekStreak,
-  getWeeklyCompletedWorkouts,
-} from "./actions";
+import { getNextWorkout, getWeeklyCompletedWorkouts } from "./actions";
 import WorkoutCard from "../components/workout-card";
 import ErrorCard from "../components/error-card";
 import { getISOWeek } from "date-fns";
@@ -11,6 +7,8 @@ import { Suspense } from "react";
 import { CompletedWorkout, Streak } from "../types";
 import CompletedExerciseCard from "../components/complete-exercise-card";
 import Link from "next/link";
+import { getCurrentStreak } from "./stats/actions";
+import { getUserGoal } from "./profile/actions";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -108,7 +106,8 @@ function WorkoutSkeleton() {
 // Stats Section
 async function StatsSection() {
   const thisWeeksWorkouts = await getWeeklyCompletedWorkouts();
-  const streak = await getUserWeekStreak();
+  const streak = await getCurrentStreak();
+  const goal = await getUserGoal();
 
   if ("error" in thisWeeksWorkouts) {
     return (
@@ -129,10 +128,24 @@ async function StatsSection() {
     );
   }
 
+  if ("error" in goal) {
+    return (
+      <div className="h-40 w-full">
+        <ErrorCard
+          errorText={goal.error ?? "An unknown error occurred."}
+          variant="secondary"
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="">
       <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
-        <WorkoutStats workouts={thisWeeksWorkouts} streak={streak} />
+        <WorkoutStats
+          workouts={thisWeeksWorkouts}
+          goal={goal.workout_goal_per_week.toString()}
+        />
         <WeekStreak streak={streak} />
       </div>
       <div className="mt-6">
@@ -157,15 +170,16 @@ async function StatsSection() {
 
 async function WorkoutStats({
   workouts,
-  streak,
+  goal,
 }: {
   workouts?: CompletedWorkout[];
-  streak?: Streak;
+  goal?: string;
 }) {
+  console.log(goal);
   return (
     <div className="">
       <p className="text-foreground text-center text-6xl font-medium">
-        {workouts?.length}/{streak?.goal}
+        {workouts?.length}/{goal}
       </p>
       <p className="text-foreground text-sm font-light">Workouts this week</p>
     </div>

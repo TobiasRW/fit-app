@@ -122,8 +122,12 @@ export type CompletedWorkout = {
   completed_exercises: CompletedExercise[];
 };
 
+export type UserGoal = {
+  workout_goal_per_week: number;
+};
+
 export type Streak = {
   error?: string | undefined;
   streak?: number | undefined;
-  goal?: number | undefined;
+  // goal?: number | undefined;
 };
