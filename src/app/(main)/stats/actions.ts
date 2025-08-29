@@ -51,11 +51,6 @@ export async function getUserDayOfWeekCounts(): Promise<
     async () => {
       const supabase = await createServiceClient();
 
-      // timeout to simulate error 50% of the time
-      if (Math.random() < 0.5) {
-        return { streak: 0, error: "Failed to load current streak" };
-      }
-
       // Fetch all completed workouts
       const { data, error } = await supabase
         .from("completed_workouts")
