@@ -15,13 +15,15 @@ import { createServiceClient } from "@/utils/supabase/service-client";
 export async function getNextWorkout(): Promise<UpcomingWorkout> {
   // const supabase = await createClient();
   const { user } = await checkAuthentication();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const getCachedData = unstable_cache(
     async () => {
       const supabase = await createServiceClient();
       // Update get_upcoming_workout function to take user_id as a parameter
-      const { data, error } = await supabase.rpc("get_next_workout", {
+      const { data, error } = await supabase.rpc("get_upcoming_workout", {
         user_uuid: user.id,
+        tz: timezone,
       });
 
       if (!data || data.length === 0) {

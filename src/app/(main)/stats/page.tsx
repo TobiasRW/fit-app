@@ -11,6 +11,7 @@ import {
   getWorkoutTimeStats,
 } from "./actions";
 import ErrorCard from "@/app/components/error-card";
+import { toZonedTime } from "date-fns-tz";
 
 const prDefinitions = [
   { name: "Bench Press", fetch: getUserBenchPressPR, tag: "bench-press-pr" },
@@ -180,9 +181,15 @@ async function TimeOfDayChart() {
   const totalWorkouts = timeOfDayStats.length;
   const intervalData = timeIntervals.map((interval) => {
     const count = timeOfDayStats.filter((workout) => {
-      const hour = new Date(workout.completed_at).getHours();
+      const localDate = toZonedTime(
+        workout.completed_at,
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+      );
+      const hour = localDate.getHours();
+
       return hour >= interval.start && hour < interval.end;
     }).length;
+
     return {
       ...interval,
       count,

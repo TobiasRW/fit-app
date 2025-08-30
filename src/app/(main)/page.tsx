@@ -187,7 +187,6 @@ async function WorkoutStats({
   workouts?: CompletedWorkout[];
   goal?: string;
 }) {
-  console.log(goal);
   return (
     <div className="">
       <p className="text-foreground text-center text-6xl font-medium">
