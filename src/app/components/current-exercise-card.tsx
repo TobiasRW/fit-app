@@ -23,8 +23,51 @@ export default function CurrentExerciseCard({
     saveCompletedExercise,
     {},
   );
-  const saved = exercise.currentSessionData?.saved_at;
-  const isCompleted = saved || state.success;
+
+  // Get the completion status of the sets
+  const getSetCompletionStatus = () => {
+    const totalSets = exercise.sets.length;
+    const savedSetsCount = exercise.currentSessionData?.sets?.length ?? 0;
+
+    if (savedSetsCount === totalSets) {
+      return "complete";
+    } else if (savedSetsCount > 0) {
+      return "partial";
+    } else {
+      return "none";
+    }
+  };
+
+  const setStatus = getSetCompletionStatus();
+
+  // Function to render the appropriate status badge
+  const renderStatusBadge = () => {
+    if (workoutCompleted) {
+      return (
+        <span className="bg-foreground/50 rounded-full px-2 py-1 text-[10px] text-white">
+          Saved
+        </span>
+      );
+    }
+
+    switch (setStatus) {
+      case "complete":
+        return (
+          <span className="rounded-full bg-green-500 px-2 py-1 text-[10px] text-white">
+            Complete
+          </span>
+        );
+      case "partial":
+        return (
+          <span className="rounded-full bg-yellow-500 px-2 py-1 text-[10px] text-white">
+            In Progress
+          </span>
+        );
+      case "none":
+      default:
+        return null;
+    }
+  };
 
   useEffect(() => {
     if (state.success && !pending) {
@@ -46,20 +89,7 @@ export default function CurrentExerciseCard({
         >
           <div className="flex w-full items-center justify-between gap-4">
             <h3 className="font-semibold">{exercise.exercise.name}</h3>
-            {isCompleted && !workoutCompleted && (
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-green-500 px-2 py-1 text-[10px] text-white">
-                  Saved
-                </span>
-              </div>
-            )}
-            {workoutCompleted && (
-              <div className="flex items-center gap-2">
-                <span className="bg-foreground/50 rounded-full px-2 py-1 text-[10px] text-white">
-                  Saved
-                </span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">{renderStatusBadge()}</div>
           </div>
           <CaretDownIcon
             size={24}
