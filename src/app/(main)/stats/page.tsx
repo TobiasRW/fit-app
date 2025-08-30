@@ -181,10 +181,7 @@ async function TimeOfDayChart() {
   const totalWorkouts = timeOfDayStats.length;
   const intervalData = timeIntervals.map((interval) => {
     const count = timeOfDayStats.filter((workout) => {
-      const localDate = toZonedTime(
-        workout.completed_at,
-        Intl.DateTimeFormat().resolvedOptions().timeZone,
-      );
+      const localDate = toZonedTime(workout.completed_at, "Europe/Copenhagen");
       const hour = localDate.getHours();
 
       return hour >= interval.start && hour < interval.end;

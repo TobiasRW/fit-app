@@ -15,7 +15,7 @@ import { createServiceClient } from "@/utils/supabase/service-client";
 export async function getNextWorkout(): Promise<UpcomingWorkout> {
   // const supabase = await createClient();
   const { user } = await checkAuthentication();
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timezone = "Europe/Copenhagen";
 
   const getCachedData = unstable_cache(
     async () => {
