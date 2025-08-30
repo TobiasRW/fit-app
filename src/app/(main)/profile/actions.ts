@@ -66,6 +66,21 @@ export async function updateUserGoal(
     return { error: "Failed to update user goal" };
   }
 
+  // Update current week's streak event with new goal
+  const { error: streakError } = await supabase.rpc(
+    "update_weekly_streak_event",
+    {
+      user_id_param: user.id,
+      completed_at_param: new Date().toISOString(), // the rpc function automatically finds the current week based on this date
+    },
+  );
+
+  if (streakError) {
+    console.error("Failed to update streak after goal change:", streakError);
+    // Don't return error here since the main job is to update the goal, and it succeeded.
+    // The streak update is secondary and will update when the user next saves a workout
+  }
+
   revalidateTag(`user-${user.id}`);
 
   return { success: true };
