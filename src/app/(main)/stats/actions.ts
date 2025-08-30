@@ -92,6 +92,36 @@ export async function getUserDayOfWeekCounts(): Promise<
   return getCachedData();
 }
 
+// Function to get time of day stats for completed workouts
+export async function getWorkoutTimeStats() {
+  const { user } = await checkAuthentication();
+
+  const getCachedData = unstable_cache(
+    async () => {
+      const supabase = await createServiceClient();
+
+      const { data, error } = await supabase
+        .from("completed_workouts")
+        .select("completed_at")
+        .eq("user_id", user.id);
+
+      if (error) {
+        console.error("Error fetching workout time stats:", error);
+        return { error: "Failed to load your workout time stats" };
+      }
+
+      return data;
+    },
+    [`user-workout-time-stats-${user.id}`],
+    {
+      tags: [`user-${user.id}`, `${user.id}-workout-time-stats`],
+      revalidate: 3600,
+    },
+  );
+
+  return getCachedData();
+}
+
 // Get current streak
 export async function getCurrentStreak(): Promise<Streak> {
   const { user } = await checkAuthentication();
