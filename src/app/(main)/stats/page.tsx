@@ -46,6 +46,9 @@ export default async function Page() {
         <section className="mt-10">
           <h3 className="mb-2 text-xl font-medium"> Time of Day</h3>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
+          <p className="text-foreground/50 mt-1 text-xs italic">
+            This is determined by the midpoint of your workouts.
+          </p>
           <Suspense fallback={<LoadingTimeOfDayChart />}>
             <TimeOfDayChart />
           </Suspense>
@@ -181,10 +184,15 @@ async function TimeOfDayChart() {
   const totalWorkouts = timeOfDayStats.length;
   const intervalData = timeIntervals.map((interval) => {
     const count = timeOfDayStats.filter((workout) => {
-      const localDate = toZonedTime(workout.completed_at, "Europe/Copenhagen");
-      const hour = localDate.getHours();
+      const startTime = new Date(workout.workout_start_time);
+      const endTime = new Date(workout.completed_at);
 
-      return hour >= interval.start && hour < interval.end;
+      // Calculate midpoint of the workout
+      const midpoint = new Date((startTime.getTime() + endTime.getTime()) / 2);
+      const localMidpoint = toZonedTime(midpoint, "Europe/Copenhagen");
+      const hour = localMidpoint.getHours();
+
+      return hour >= interval.start && hour <= interval.end;
     }).length;
 
     return {

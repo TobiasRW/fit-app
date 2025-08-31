@@ -130,3 +130,8 @@ export type Streak = {
   error?: string | undefined;
   streak?: number | undefined;
 };
+
+export type WorkoutTimeStat = {
+  workout_start_time: string;
+  completed_at: string;
+};

@@ -1,5 +1,5 @@
 // import { checkAuthentication } from "@/utils/helpers/helpers";
-import { Streak } from "@/app/types";
+import { Streak, WorkoutTimeStat } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createServiceClient } from "@/utils/supabase/service-client";
 import { getDay } from "date-fns";
@@ -93,17 +93,18 @@ export async function getUserDayOfWeekCounts(): Promise<
 }
 
 // Function to get time of day stats for completed workouts
-export async function getWorkoutTimeStats() {
+export async function getWorkoutTimeStats(): Promise<
+  WorkoutTimeStat[] | { error: string }
+> {
   const { user } = await checkAuthentication();
 
   const getCachedData = unstable_cache(
     async () => {
       const supabase = await createServiceClient();
 
-      const { data, error } = await supabase
-        .from("completed_workouts")
-        .select("completed_at")
-        .eq("user_id", user.id);
+      const { data, error } = await supabase.rpc("get_workout_time_stats", {
+        user_id_param: user.id,
+      });
 
       if (error) {
         console.error("Error fetching workout time stats:", error);
