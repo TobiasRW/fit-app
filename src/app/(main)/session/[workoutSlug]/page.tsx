@@ -3,6 +3,7 @@ import { getCurrentWorkout } from "./actions";
 import CompleteWorkoutModal from "@/app/components/modals/complete-workout-modal";
 import ErrorCard from "@/app/components/error-card";
 import { Suspense } from "react";
+import SkipWorkoutModal from "@/app/components/modals/skip-workout-modal";
 
 export default async function Page({
   params,
@@ -41,7 +42,10 @@ async function CurrentWorkoutContent({ workoutSlug }: { workoutSlug: string }) {
       <section className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="mb-2 text-2xl font-semibold">Exercises</h2>
-          <CompleteWorkoutModal workout={workout} />
+          <div className="flex items-center justify-center gap-2">
+            {!workout.completed && <SkipWorkoutModal workout={workout} />}
+            <CompleteWorkoutModal workout={workout} />
+          </div>
         </div>
         <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
       </section>

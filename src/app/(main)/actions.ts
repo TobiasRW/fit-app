@@ -20,8 +20,8 @@ export async function getNextWorkout(): Promise<UpcomingWorkout> {
   const getCachedData = unstable_cache(
     async () => {
       const supabase = await createServiceClient();
-      // Update get_upcoming_workout function to take user_id as a parameter
-      const { data, error } = await supabase.rpc("get_upcoming_workout", {
+
+      const { data, error } = await supabase.rpc("get_next_workout_in_line", {
         user_uuid: user.id,
         tz: timezone,
       });

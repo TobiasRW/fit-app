@@ -4,6 +4,7 @@ import { CurrentWorkout, InitialState } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createServiceClient } from "@/utils/supabase/service-client";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { redirect } from "next/navigation";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
 
@@ -141,4 +142,42 @@ export async function saveCompletedWorkout(
       error: error instanceof Error ? error.message : "Failed to save workout",
     };
   }
+}
+
+// Function to skip a workout
+export async function skipWorkout(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  const { supabase, user } = await checkAuthentication();
+
+  const workoutId = formData.get("workoutId") as string;
+  const workoutSlug = formData.get("workoutSlug") as string;
+
+  try {
+    const { data, error } = await supabase.rpc("skip_workout", {
+      user_id_param: user.id,
+      workout_id_param: workoutId,
+    });
+
+    if (error) throw error;
+
+    if (!data || data === null) {
+      return { error: "Workout not found or you don't have access to it" };
+    }
+
+    if (!data.success) {
+      return { error: data.error || "Failed to skip workout" };
+    }
+
+    revalidatePath(`/session/${workoutSlug}`);
+    revalidateTag(`user-${user.id}`);
+  } catch (error) {
+    console.error("Error skipping workout:", error);
+    return {
+      error: error instanceof Error ? error.message : "Failed to skip workout",
+    };
+  }
+
+  redirect("/");
 }
