@@ -77,13 +77,7 @@ async function WorkoutSection() {
   }
 
   if ("error" in nextWorkout) {
-    return (
-      <ErrorCard
-        errorText={nextWorkout.error}
-        variant="primary"
-        tag="next-workout"
-      />
-    );
+    return <ErrorCard errorText={nextWorkout.error} variant="primary" />;
   }
 
   return (
@@ -118,11 +112,7 @@ async function StatsSection() {
   if ("error" in thisWeeksWorkouts) {
     return (
       <div className="h-40 w-full">
-        <ErrorCard
-          errorText={thisWeeksWorkouts.error}
-          variant="secondary"
-          tag="weekly-completed-workouts"
-        />
+        <ErrorCard errorText={thisWeeksWorkouts.error} variant="secondary" />
       </div>
     );
   }
@@ -133,7 +123,6 @@ async function StatsSection() {
         <ErrorCard
           errorText={streak.error ?? "An unknown error occurred."}
           variant="secondary"
-          tag="current-streak"
         />
       </div>
     );
@@ -145,7 +134,6 @@ async function StatsSection() {
         <ErrorCard
           errorText={goal.error ?? "An unknown error occurred."}
           variant="secondary"
-          tag="goal"
         />
       </div>
     );

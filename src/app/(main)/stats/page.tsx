@@ -14,9 +14,9 @@ import ErrorCard from "@/app/components/error-card";
 import { toZonedTime } from "date-fns-tz";
 
 const prDefinitions = [
-  { name: "Bench Press", fetch: getUserBenchPressPR, tag: "bench-press-pr" },
-  { name: "Squat", fetch: getUserSquatPR, tag: "squat-pr" },
-  { name: "Deadlift", fetch: getUserDeadliftPR, tag: "deadlift-pr" },
+  { name: "Bench Press", fetch: getUserBenchPressPR },
+  { name: "Squat", fetch: getUserSquatPR },
+  { name: "Deadlift", fetch: getUserDeadliftPR },
 ];
 
 export default async function Page() {
@@ -67,7 +67,7 @@ export default async function Page() {
           <div className="mt-4 flex items-center justify-between gap-4">
             {prDefinitions.map((def) => (
               <Suspense key={def.name} fallback={<LoadingPR />}>
-                <PRCard name={def.name} fetch={def.fetch} tag={def.tag} />
+                <PRCard name={def.name} fetch={def.fetch} />
               </Suspense>
             ))}
           </div>
@@ -80,22 +80,16 @@ export default async function Page() {
 async function PRCard({
   name,
   fetch,
-  tag,
 }: {
   name: string;
   fetch: () => Promise<number | { error: string } | null>;
-  tag: string;
 }) {
   const pr = await fetch();
 
   if (typeof pr === "object" && pr !== null && "error" in pr) {
     return (
       <div className="h-26 w-full">
-        <ErrorCard
-          errorText={"Failed to Load PR"}
-          variant="secondary"
-          tag={tag}
-        />
+        <ErrorCard errorText={"Failed to Load PR"} variant="secondary" />
       </div>
     );
   }
@@ -122,7 +116,6 @@ async function WorkoutYearCompletion() {
         <ErrorCard
           errorText={"Failed to load your total workouts completed"}
           variant="secondary"
-          tag="total-completed-workouts"
         />
       </div>
     );
@@ -130,11 +123,7 @@ async function WorkoutYearCompletion() {
   if ("error" in goal) {
     return (
       <div className="mt-10 h-24 w-full">
-        <ErrorCard
-          errorText={"Failed to load your goal"}
-          variant="secondary"
-          tag="goal"
-        />
+        <ErrorCard errorText={"Failed to load your goal"} variant="secondary" />
       </div>
     );
   }
@@ -165,7 +154,6 @@ async function TimeOfDayChart() {
         <ErrorCard
           errorText={"Failed to load your workout time stats"}
           variant="secondary"
-          tag="workout-time-stats"
         />
       </div>
     );
@@ -246,11 +234,7 @@ async function BarChart() {
   if (!Array.isArray(dayCounts)) {
     return (
       <div className="mt-10 h-40 w-full">
-        <ErrorCard
-          errorText={dayCounts.error}
-          variant="secondary"
-          tag="day-percentages"
-        />
+        <ErrorCard errorText={dayCounts.error} variant="secondary" />
       </div>
     );
   }
@@ -311,7 +295,6 @@ async function TotalSquare() {
         <ErrorCard
           errorText={totalWorkouts.error ?? "An unknown error occurred."}
           variant="secondary"
-          tag="total-completed-workouts"
         />
       </div>
     );
@@ -334,7 +317,6 @@ async function StreakSquare() {
         <ErrorCard
           errorText={streak.error ?? "An unknown error occurred."}
           variant="secondary"
-          tag="current-streak"
         />
       </div>
     );
@@ -360,7 +342,6 @@ async function LongestStreak() {
         <ErrorCard
           errorText={streak.error ?? "An unknown error occurred."}
           variant="secondary"
-          tag="longest-streak"
         />
       </div>
     );

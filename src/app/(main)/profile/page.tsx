@@ -52,7 +52,7 @@ async function GoalSection() {
   if ("error" in goal) {
     return (
       <div className="h-20">
-        <ErrorCard errorText={goal.error} variant="secondary" tag="goal" />
+        <ErrorCard errorText={goal.error} variant="secondary" />
       </div>
     );
   }

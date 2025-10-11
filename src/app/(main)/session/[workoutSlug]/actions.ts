@@ -2,8 +2,7 @@
 
 import { CurrentWorkout, InitialState } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
-import { createServiceClient } from "@/utils/supabase/service-client";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
@@ -12,40 +11,31 @@ import { redirect } from "next/navigation";
 export async function getCurrentWorkout(
   workoutSlug: string,
 ): Promise<CurrentWorkout | { error: string }> {
-  const { user } = await checkAuthentication();
+  const { user, supabase } = await checkAuthentication();
 
-  const getCachedData = unstable_cache(
-    async () => {
-      const supabase = await createServiceClient();
-      const { data, error } = await supabase.rpc(
-        "get_workout_with_last_performance",
-        {
-          workout_slug_param: workoutSlug,
-          user_id_param: user.id,
-        },
-      );
-
-      if (error) {
-        console.error("RPC error:", error);
-        return { error: "Database error occurred" };
-      }
-
-      if (!data || data === null) {
-        return { error: "Workout not found or you don't have access to it" };
-      }
-
-      // Check if workout has no exercises
-      if (!data.exercises || data.exercises.length === 0) {
-        return { error: "This workout has no exercises configured" };
-      }
-
-      return data;
+  const { data, error } = await supabase.rpc(
+    "get_workout_with_last_performance",
+    {
+      workout_slug_param: workoutSlug,
+      user_id_param: user.id,
     },
-    [`current-workout-${workoutSlug}`],
-    { tags: [`user-${user.id}`, `${user.id}-current-workout`] },
   );
 
-  return getCachedData();
+  if (error) {
+    console.error("RPC error:", error);
+    return { error: "Database error occurred" };
+  }
+
+  if (!data || data === null) {
+    return { error: "Workout not found or you don't have access to it" };
+  }
+
+  // Check if workout has no exercises
+  if (!data.exercises || data.exercises.length === 0) {
+    return { error: "This workout has no exercises configured" };
+  }
+
+  return data;
 }
 
 //_____________________ WRITE FUNCTIONS (POST) _____________________
@@ -94,7 +84,6 @@ export async function saveCompletedExercise(
 
     if (data?.success) {
       revalidatePath(`/session/${workoutSlug}`);
-      revalidateTag(`user-${user.id}`);
       return { success: data.message };
     } else {
       return { error: data?.error || "Failed to save exercise" };
@@ -131,7 +120,6 @@ export async function saveCompletedWorkout(
 
     if (data.success) {
       revalidatePath(`/session/${workoutSlug}`);
-      revalidateTag(`user-${user.id}`);
       return { success: "Workout saved successfully" };
     } else {
       return { error: data.error || "Failed to save workout" };
@@ -171,7 +159,6 @@ export async function skipWorkout(
     }
 
     revalidatePath(`/session/${workoutSlug}`);
-    revalidateTag(`user-${user.id}`);
   } catch (error) {
     console.error("Error skipping workout:", error);
     return {

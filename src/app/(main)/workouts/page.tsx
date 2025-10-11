@@ -25,11 +25,7 @@ async function WorkoutPlansList() {
   if ("error" in workoutPlans) {
     return (
       <div className="mt-8">
-        <ErrorCard
-          errorText={workoutPlans.error}
-          variant="primary"
-          tag="workout-plans"
-        />
+        <ErrorCard errorText={workoutPlans.error} variant="primary" />
       </div>
     );
   }

@@ -1,54 +1,39 @@
 "use server";
 
 import { notFound, redirect } from "next/navigation";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { WorkoutExercise, InitialState } from "@/app/types";
 import { checkAuthentication, generateSlug } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
-import { createServiceClient } from "@/utils/supabase/service-client";
 
 //_____________________ READ FUNCTIONS (GET) _____________________
 
 // Function to get all the user's workout plans
 export async function getUserWorkoutPlans() {
-  const { user } = await checkAuthentication();
+  const { user, supabase } = await checkAuthentication();
 
-  const getCachedData = unstable_cache(
-    async () => {
-      const supabase = await createServiceClient();
+  const { data: workoutPlans, error } = await supabase
+    .from("workout_plans")
+    .select("id, name, slug, is_active")
+    .eq("user_id", user.id)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false });
 
-      const { data: workoutPlans, error } = await supabase
-        .from("workout_plans")
-        .select("id, name, slug, is_active")
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false });
+  if (error) {
+    return { error: "Failed to load workout plans" };
+  }
 
-      if (error) {
-        return { error: "Failed to load workout plans" };
-      }
-
-      return workoutPlans || [];
-    },
-    [`user-workout-plans-${user.id}`],
-    { tags: [`user-${user.id}`, `${user.id}-workout-plans`], revalidate: 3600 },
-  );
-
-  return getCachedData();
+  return workoutPlans || [];
 }
 
 // Function to get a specific workout plan by slug
 export async function getWorkoutPlan(slug: string) {
-  const { user } = await checkAuthentication();
+  const { user, supabase } = await checkAuthentication();
 
-  const getCachedData = unstable_cache(
-    async () => {
-      const supabase = await createServiceClient();
-
-      const { data: workoutPlan, error } = await supabase
-        .from("workout_plans")
-        .select(
-          `
+  const { data: workoutPlan, error } = await supabase
+    .from("workout_plans")
+    .select(
+      `
       id, 
       name,
       slug,
@@ -59,28 +44,22 @@ export async function getWorkoutPlan(slug: string) {
         order_index
       )
     `,
-        )
-        .eq("slug", slug)
-        .eq("user_id", user.id)
-        .is("workouts.deleted_at", null)
-        .order("order_index", { referencedTable: "workouts", ascending: true })
-        .single();
+    )
+    .eq("slug", slug)
+    .eq("user_id", user.id)
+    .is("workouts.deleted_at", null)
+    .order("order_index", { referencedTable: "workouts", ascending: true })
+    .single();
 
-      if (!workoutPlan) {
-        notFound();
-      }
+  if (!workoutPlan) {
+    notFound();
+  }
 
-      if (error) {
-        return { error: "Failed to load workout plan" };
-      }
+  if (error) {
+    return { error: "Failed to load workout plan" };
+  }
 
-      return workoutPlan;
-    },
-    [`workout-plan-${user.id}`],
-    { tags: [`user-${user.id}`, `${user.id}-workout-plan`], revalidate: 3600 },
-  );
-
-  return getCachedData();
+  return workoutPlan;
 }
 
 // Function to get a specific workout in a plan
@@ -88,56 +67,43 @@ export async function getWorkoutFromPlan(
   planSlug: string,
   workoutSlug: string,
 ) {
-  const { user } = await checkAuthentication();
-  const getCachedData = unstable_cache(
-    async () => {
-      const supabase = await createServiceClient();
+  const { user, supabase } = await checkAuthentication();
 
-      const { data: workout, error } = await supabase
-        .from("workouts")
-        .select(
-          `
+  const { data: workout, error } = await supabase
+    .from("workouts")
+    .select(
+      `
       id, 
       name, 
       slug, 
       order_index,
       workout_plans!inner()
     `,
-        )
-        .eq("slug", workoutSlug)
-        .eq("workout_plans.slug", planSlug)
-        .eq("workout_plans.user_id", user.id)
-        .single();
+    )
+    .eq("slug", workoutSlug)
+    .eq("workout_plans.slug", planSlug)
+    .eq("workout_plans.user_id", user.id)
+    .single();
 
-      if (!workout) {
-        notFound();
-      }
+  if (!workout) {
+    notFound();
+  }
 
-      if (error) {
-        return { error: "Failed to load workout" };
-      }
+  if (error) {
+    return { error: "Failed to load workout" };
+  }
 
-      return workout;
-    },
-    [`workout-${planSlug}-${workoutSlug}-${user.id}`],
-    { tags: [`user-${user.id}`, `${user.id}-workout`], revalidate: 3600 },
-  );
-
-  return getCachedData();
+  return workout;
 }
 
 // Function to get exercises from a workout
 export async function getExercisesFromWorkout(workoutId: string) {
-  const { user } = await checkAuthentication();
+  const { user, supabase } = await checkAuthentication();
 
-  const getCachedData = unstable_cache(
-    async () => {
-      const supabase = await createServiceClient();
-
-      const { data: workoutExercises, error } = await supabase
-        .from("workout_exercises")
-        .select(
-          `
+  const { data: workoutExercises, error } = await supabase
+    .from("workout_exercises")
+    .select(
+      `
       id,
       order_index,
       exercises!inner (
@@ -157,31 +123,24 @@ export async function getExercisesFromWorkout(workoutId: string) {
         )
       )
     `,
-        )
-        .eq("workout_id", workoutId)
-        .eq("workouts.workout_plans.user_id", user.id) // filter by user_id on joined plan
-        .is("deleted_at", null)
-        .order("order_index", { ascending: true })
-        .overrideTypes<WorkoutExercise[]>();
+    )
+    .eq("workout_id", workoutId)
+    .eq("workouts.workout_plans.user_id", user.id) // filter by user_id on joined plan
+    .is("deleted_at", null)
+    .order("order_index", { ascending: true })
+    .overrideTypes<WorkoutExercise[]>();
 
-      if (error) {
-        return { error: "Failed to load exercises" };
-      }
+  if (error) {
+    return { error: "Failed to load exercises" };
+  }
 
-      // Sort sets by set_number and return the result
-      return (
-        workoutExercises?.map((exercise) => ({
-          ...exercise,
-          sets:
-            exercise.sets?.sort((a, b) => a.set_number - b.set_number) || [],
-        })) || []
-      );
-    },
-    [`workout-exercises-${workoutId}-${user.id}`],
-    { tags: [`user-${user.id}`, `${user.id}-exercises`], revalidate: 3600 },
+  // Sort sets by set_number and return the result
+  return (
+    workoutExercises?.map((exercise) => ({
+      ...exercise,
+      sets: exercise.sets?.sort((a, b) => a.set_number - b.set_number) || [],
+    })) || []
   );
-
-  return getCachedData();
 }
 
 // Function to get all exercises from the database
@@ -243,7 +202,7 @@ export async function createWorkoutPlan(
       throw new Error(`Database error: ${error.message}`);
     }
 
-    revalidateTag(`user-${user.id}`);
+    revalidatePath("/workouts");
     return { success: true };
   } catch (error) {
     console.error("Unexpected error creating workout plan:", error);
@@ -259,7 +218,7 @@ export async function addWorkoutToPlan(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { user, supabase } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
 
     const planId = formData.get("planId") as string;
     const planSlug = formData.get("planSlug") as string;
@@ -288,7 +247,6 @@ export async function addWorkoutToPlan(
     }
 
     revalidatePath(`/workouts/${planSlug}`);
-    revalidateTag(`user-${user.id}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error adding workout to plan:", error);
@@ -302,7 +260,7 @@ export async function addExerciseToWorkout(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { user, supabase } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
 
     // get data from form
     const workoutId = formData.get("workoutId") as string;
@@ -327,7 +285,6 @@ export async function addExerciseToWorkout(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
-    revalidateTag(`user-${user.id}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error adding exercise to workout:", error);
@@ -345,7 +302,7 @@ export async function updateExercise(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
 
     const workoutExerciseId = formData.get("workoutExerciseId") as string;
     const planSlug = formData.get("planSlug") as string;
@@ -378,7 +335,6 @@ export async function updateExercise(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
-    revalidateTag(`user-${user.id}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error updating exercise:", error);
@@ -393,7 +349,7 @@ export async function updateWorkoutPlan(
   prevState: InitialState,
   formData: FormData,
 ): Promise<InitialState> {
-  const { supabase, user } = await checkAuthentication();
+  const { supabase } = await checkAuthentication();
   const planId = formData.get("planId") as string;
   const newName = formData.get("name") as string;
 
@@ -416,7 +372,6 @@ export async function updateWorkoutPlan(
       error: "An unexpected error occurred. Please try again.",
     };
   }
-  revalidateTag(`user-${user.id}`);
   redirect(`/workouts/${slug}`);
 }
 
@@ -425,7 +380,7 @@ export async function updateWorkoutName(
   prevState: InitialState,
   formData: FormData,
 ): Promise<InitialState> {
-  const { supabase, user } = await checkAuthentication();
+  const { supabase } = await checkAuthentication();
   const workoutId = formData.get("workoutId") as string;
   const newName = formData.get("name") as string;
   const planSlug = formData.get("planSlug") as string;
@@ -449,7 +404,6 @@ export async function updateWorkoutName(
       error: "An unexpected error occurred. Please try again.",
     };
   }
-  revalidateTag(`user-${user.id}`);
   redirect(`/workouts/${planSlug}/${slug}`);
 }
 
@@ -479,7 +433,6 @@ export async function setActivePlan(
     }
 
     revalidatePath("/workouts");
-    revalidateTag(`user-${user.id}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error setting active plan:", error);
@@ -515,7 +468,6 @@ export async function deactivatePlan(
     }
 
     revalidatePath("/workouts");
-    revalidateTag(`user-${user.id}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error deactivating workout plan:", error);
@@ -533,7 +485,7 @@ export async function deleteExerciseFromWorkout(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
 
     const workoutExerciseId = formData.get("workoutExerciseId") as string;
     const workoutId = formData.get("workoutId") as string;
@@ -558,7 +510,6 @@ export async function deleteExerciseFromWorkout(
       return { error: "Failed to delete exercise. Please try again." };
     }
 
-    revalidateTag(`user-${user.id}`);
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
     return { success: true };
   } catch (error) {
@@ -575,7 +526,7 @@ export async function deleteWorkout(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
 
     const workoutId = formData.get("workoutId") as string;
     const planId = formData.get("planId") as string;
@@ -599,7 +550,6 @@ export async function deleteWorkout(
       return { error: "Failed to delete workout. Please try again." };
     }
 
-    revalidateTag(`user-${user.id}`);
     revalidatePath(`/workouts/${planSlug}`);
     return { success: true };
   } catch (error) {
@@ -616,7 +566,7 @@ export async function deleteWorkoutPlan(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
     const planId = formData.get("planId") as string;
 
     if (!planId) {
@@ -634,7 +584,6 @@ export async function deleteWorkoutPlan(
       return { error: "Failed to delete workout plan. Please try again." };
     }
 
-    revalidateTag(`user-${user.id}`);
     revalidatePath("/workouts");
     return { success: true };
   } catch (error) {
@@ -653,7 +602,7 @@ export async function softDeleteWorkoutPlan(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
     const planId = formData.get("planId") as string;
 
     if (!planId) {
@@ -674,7 +623,6 @@ export async function softDeleteWorkoutPlan(
       };
     }
 
-    revalidateTag(`user-${user.id}`);
     revalidatePath("/workouts");
     return { success: true };
   } catch (error) {
@@ -691,7 +639,7 @@ export async function softDeleteWorkout(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
     const workoutId = formData.get("workoutId") as string;
     const planSlug = formData.get("planSlug") as string;
 
@@ -708,7 +656,6 @@ export async function softDeleteWorkout(
       return { error: "Failed to delete workout. Please try again." };
     }
 
-    revalidateTag(`user-${user.id}`);
     revalidatePath(`/workouts/${planSlug}`);
     return { success: true };
   } catch (error) {
@@ -725,7 +672,7 @@ export async function softDeleteWorkoutExercise(
   formData: FormData,
 ): Promise<InitialState> {
   try {
-    const { supabase, user } = await checkAuthentication();
+    const { supabase } = await checkAuthentication();
 
     const workoutExerciseId = formData.get("workoutExerciseId") as string;
     const planSlug = formData.get("planSlug") as string;
@@ -747,7 +694,6 @@ export async function softDeleteWorkoutExercise(
       return { error: "Failed to delete exercise. Please try again." };
     }
 
-    revalidateTag(`user-${user.id}`);
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
     return { success: true };
   } catch (error) {
