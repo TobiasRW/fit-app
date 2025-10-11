@@ -32,6 +32,13 @@ async function CurrentWorkoutContent({ workoutSlug }: { workoutSlug: string }) {
     );
   }
 
+  const hasLoggedSets = workout.exercises.some(
+    (exercise) =>
+      exercise.currentSessionData &&
+      exercise.currentSessionData.sets &&
+      exercise.currentSessionData.sets.length > 0,
+  );
+
   return (
     <>
       <h1 className="text-green text-4xl font-bold">{workout.name}</h1>
@@ -39,7 +46,10 @@ async function CurrentWorkoutContent({ workoutSlug }: { workoutSlug: string }) {
         <div className="flex items-center justify-between">
           <h2 className="mb-2 text-2xl font-semibold">Exercises</h2>
           <div className="flex items-center justify-center gap-2">
-            {!workout.completed && <SkipWorkoutModal workout={workout} />}
+            {!workout.completed && !hasLoggedSets && (
+              <SkipWorkoutModal workout={workout} />
+            )}
+
             <CompleteWorkoutModal workout={workout} />
           </div>
         </div>
