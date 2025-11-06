@@ -15,6 +15,8 @@ type InputProps = {
   defaultValue?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
+  className?: string;
+  labelRow?: boolean;
 };
 
 export default function Input({
@@ -34,6 +36,8 @@ export default function Input({
   value,
   onChange,
   onFocus,
+  className,
+  labelRow = false,
 }: InputProps) {
   const variants = {
     outlined: "border border-gray-300 rounded-md p-2 ",
@@ -42,11 +46,13 @@ export default function Input({
     table: "bg-transparent text-center focus:outline-none w-full",
   };
   return (
-    <div className="flex flex-col space-y-1">
+    <div
+      className={`flex ${labelRow ? "items-center gap-2" : "flex-col space-y-1"} `}
+    >
       {label && <label className="font-medium">{label}</label>}
       <input
         step={step}
-        className={`${variants[variant]}`}
+        className={`${variants[variant]} ${className}`}
         placeholder={placeholder}
         type={type}
         id={id}

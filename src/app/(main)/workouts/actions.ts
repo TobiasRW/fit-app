@@ -477,6 +477,51 @@ export async function deactivatePlan(
   }
 }
 
+// Function to reorder an exercise within a workout
+export async function reorderWorkoutExercise(
+  prevState: InitialState,
+  formData: FormData,
+): Promise<InitialState> {
+  try {
+    const { supabase } = await checkAuthentication();
+
+    const workoutExerciseId = formData.get("workoutExerciseId") as string;
+    const newOrderIndex = parseInt(formData.get("newOrderIndex") as string);
+    const planSlug = formData.get("planSlug") as string;
+    const workoutSlug = formData.get("workoutSlug") as string;
+
+    if (!workoutExerciseId) {
+      return { error: "Workout exercise ID is required" };
+    }
+
+    if (isNaN(newOrderIndex) || newOrderIndex < 0) {
+      return { error: "Valid order index is required" };
+    }
+
+    // Call the RPC function to reorder the exercise
+    const { error: reorderError } = await supabase.rpc(
+      "reorder_workout_exercise",
+      {
+        p_workout_exercise_id: workoutExerciseId,
+        p_new_order_index: newOrderIndex,
+      },
+    );
+
+    if (reorderError) {
+      console.error("Reorder exercise error:", reorderError);
+      return { error: "Failed to reorder exercise. Please try again." };
+    }
+
+    revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error reordering exercise:", error);
+    return {
+      error: "An unexpected error occurred. Please try again.",
+    };
+  }
+}
+
 //_________________________ DELETE FUNCTIONS (DELETE) _____________________
 
 // Function to delete an exercise from a workout

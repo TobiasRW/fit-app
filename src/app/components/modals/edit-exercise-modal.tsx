@@ -1,6 +1,9 @@
 "use client";
 import { motion } from "motion/react";
-import { updateExercise } from "../../(main)/workouts/actions";
+import {
+  updateExercise,
+  reorderWorkoutExercise,
+} from "../../(main)/workouts/actions";
 import { useActionState, useEffect, useState } from "react";
 import { XIcon } from "@phosphor-icons/react";
 import Form from "next/form";
@@ -20,6 +23,10 @@ export default function EditExerciseModal({
   setIsEditing: (isEditing: boolean) => void;
 }) {
   const [state, formAction, pending] = useActionState(updateExercise, {});
+  const [orderState, orderAction, orderPending] = useActionState(
+    reorderWorkoutExercise,
+    {},
+  );
 
   // Initialize with existing sets data
   const [setReps, setSetReps] = useState<number[]>(
@@ -30,10 +37,10 @@ export default function EditExerciseModal({
 
   // Close modal on success
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success || orderState?.success) {
       setIsEditing(false);
     }
-  }, [state?.success, setIsEditing]);
+  }, [state?.success, orderState?.success, setIsEditing]);
 
   const updateSetRep = (index: number, value: number) => {
     const newSetReps = [...setReps];
@@ -52,6 +59,10 @@ export default function EditExerciseModal({
       setSetReps(setReps.slice(0, -1));
     }
   };
+
+  const [newOrderIndex, setNewOrderIndex] = useState<number>(
+    typeof exercise.order_index === "number" ? exercise.order_index : 0,
+  );
 
   return (
     <>
@@ -152,14 +163,58 @@ export default function EditExerciseModal({
           </div>
 
           <Button
-            text={pending ? "Updating..." : "Update Exercise"}
+            text={pending ? "Updating..." : "Update Sets"}
             disabled={pending}
+          />
+        </Form>
+        <Form
+          action={orderAction}
+          className="mx-auto mt-20 flex w-11/12 flex-col gap-4"
+        >
+          <input type="hidden" name="planSlug" value={planSlug} />
+          <input type="hidden" name="workoutSlug" value={workoutSlug} />
+          <input type="hidden" name="workoutExerciseId" value={exercise.id} />
+          <div className="flex items-center gap-5">
+            <Input
+              type="number"
+              name="newOrderIndex"
+              value={newOrderIndex}
+              onChange={(e) => setNewOrderIndex(parseInt(e.target.value) || 0)}
+              className="max-w-20 self-center text-center"
+              label="Exercise Order: "
+              labelRow
+              min={1}
+            />
+            <button
+              type="button"
+              onClick={() => setNewOrderIndex((n) => n - 1)}
+              className="bg-green flex h-8 w-8 items-center justify-center rounded-full text-white disabled:bg-gray-300"
+              disabled={newOrderIndex <= 1}
+            >
+              <span className="text-lg font-semibold">-</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewOrderIndex((n) => n + 1)}
+              className="bg-green flex h-8 w-8 items-center justify-center rounded-full text-white disabled:bg-gray-300"
+            >
+              <span className="text-lg font-semibold">+</span>
+            </button>
+          </div>
+          <Button
+            text={orderPending ? "Reordering..." : "Reorder Exercise"}
+            disabled={orderPending}
           />
         </Form>
 
         {state?.error && (
           <div className="mx-auto w-11/12 rounded border border-red-400 bg-red-100 p-3 text-red-700">
             {state.error}
+          </div>
+        )}
+        {orderState?.error && (
+          <div className="mx-auto w-11/12 rounded border border-red-400 bg-red-100 p-3 text-red-700">
+            {orderState.error}
           </div>
         )}
       </motion.div>
