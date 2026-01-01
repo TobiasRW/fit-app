@@ -28,8 +28,8 @@ export default function Skeleton({
         width: width === "full" ? "100%" : width,
         height: height === "full" ? "100%" : height,
         borderRadius: rounded === "full" ? "9999px" : rounded,
-        paddingTop: offsetTop,
-        paddingBottom: offsetBottom,
+        marginTop: offsetTop,
+        marginBottom: offsetBottom,
       }}
     >
       {children ? children : null}

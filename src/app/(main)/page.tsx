@@ -9,6 +9,8 @@ import CompletedExerciseCard from "../components/cards/complete-exercise-card";
 import Link from "next/link";
 import { getCurrentStreak } from "./stats/actions";
 import { getUserGoal } from "./profile/actions";
+import Skeleton from "../components/loaders/skeleton";
+import LoadingStatsSection from "../components/loaders/loading-stats-section";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -34,7 +36,7 @@ export default async function Home() {
           <h2 className="text-2xl font-medium">Next Workout</h2>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
         </div>
-        <Suspense fallback={<WorkoutSkeleton />}>
+        <Suspense fallback={<Skeleton height={104} />}>
           <WorkoutSection />
         </Suspense>
       </section>
@@ -93,13 +95,6 @@ async function WorkoutSection() {
         variant="upcoming"
       />
     </>
-  );
-}
-
-// Loading component for the workout section
-function WorkoutSkeleton() {
-  return (
-    <div className="bg-gray dark:bg-dark-gray relative flex h-26 animate-pulse flex-col justify-end overflow-hidden rounded-lg p-2 drop-shadow-md"></div>
   );
 }
 
@@ -195,42 +190,6 @@ async function WeekStreak({ streak }: { streak?: Streak }) {
         <span className="text-base font-bold">{streak?.streak} </span>Week
         Streak
       </p>
-    </div>
-  );
-}
-
-function LoadingStatsSection() {
-  return (
-    <div className="">
-      <div className="mx-auto flex w-11/12 items-center justify-between pt-4">
-        <div className="">
-          <p className="text-gray dark:text-dark-gray animate-pulse text-center text-6xl font-medium">
-            3/3
-          </p>
-          <div className="bg-gray dark:bg-dark-gray my-2 h-2 w-30 animate-pulse rounded-lg"></div>
-        </div>
-
-        <div className="">
-          <p className="text-gray dark:text-dark-gray animate-pulse text-center text-6xl font-medium opacity-25">
-            🔥
-          </p>
-          <div className="bg-gray dark:bg-dark-gray my-2 h-2 w-18 animate-pulse rounded-lg"></div>
-        </div>
-      </div>
-      <div className="mt-6">
-        <h3 className="mb-4 text-xl">This weeks completed workouts:</h3>
-        <div className="space-y-4">
-          <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-            <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
-          </div>
-          <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-            <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
-          </div>
-          <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-            <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
