@@ -13,7 +13,7 @@ export default function LoadingExercises() {
       {/* Exercises skeleton */}
       <div className="mt-4">
         <h2 className="text-2xl font-semibold">Exercises</h2>
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 flex flex-col gap-4">
           {[1, 2, 3, 4, 5, 6, 7].map((i) => (
             <Skeleton key={i} width="full" height={84} />
           ))}
