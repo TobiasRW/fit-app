@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import { useState } from "react";
-import { CompletedWorkout } from "../types";
+import { CompletedWorkout } from "../../types";
 
 type Props = {
   exercise: CompletedWorkout;

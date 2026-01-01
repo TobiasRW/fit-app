@@ -1,6 +1,6 @@
-import CompletedExerciseCard from "@/app/components/complete-exercise-card";
+import CompletedExerciseCard from "@/app/components/cards/complete-exercise-card";
 import { getWorkoutHistory } from "../../actions";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 import { Suspense } from "react";
 import Link from "next/link";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";

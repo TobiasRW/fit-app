@@ -1,14 +1,14 @@
 "use client";
 
-import { ExerciseWithPerformance } from "../types";
+import { ExerciseWithPerformance } from "../../types";
 import { useState, useActionState, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CaretDownIcon } from "@phosphor-icons/react";
-import { saveCompletedExercise } from "../(main)/session/[workoutSlug]/actions";
+import { saveCompletedExercise } from "../../(main)/session/[workoutSlug]/actions";
 import Form from "next/form";
-import Input from "./ui/input";
-import Textarea from "./ui/textarea";
-import Button from "./ui/button";
+import Input from "../ui/input";
+import Textarea from "../ui/textarea";
+import Button from "../ui/button";
 
 export default function CurrentExerciseCard({
   exercise,

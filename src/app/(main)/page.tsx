@@ -1,11 +1,11 @@
 import { createClient } from "@/utils/supabase/server";
 import { getNextWorkout, getWeeklyCompletedWorkouts } from "./actions";
-import WorkoutCard from "../components/workout-card";
-import ErrorCard from "../components/error-card";
+import WorkoutCard from "../components/cards/workout-card";
+import ErrorCard from "../components/cards/error-card";
 import { getISOWeek } from "date-fns";
 import { Suspense } from "react";
 import { CompletedWorkout, Streak } from "../types";
-import CompletedExerciseCard from "../components/complete-exercise-card";
+import CompletedExerciseCard from "../components/cards/complete-exercise-card";
 import Link from "next/link";
 import { getCurrentStreak } from "./stats/actions";
 import { getUserGoal } from "./profile/actions";

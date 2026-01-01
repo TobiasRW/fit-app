@@ -1,7 +1,7 @@
-import CurrentExerciseCard from "@/app/components/current-exercise-card";
+import CurrentExerciseCard from "@/app/components/cards/current-exercise-card";
 import { getCurrentWorkout } from "./actions";
 import CompleteWorkoutModal from "@/app/components/modals/complete-workout-modal";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 import { Suspense } from "react";
 import SkipWorkoutModal from "@/app/components/modals/skip-workout-modal";
 

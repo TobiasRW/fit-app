@@ -1,11 +1,11 @@
-import Avatar from "@/app/components/avatar";
+import Avatar from "@/app/components/ui/avatar";
 import { createClient } from "@/utils/supabase/server";
 import { getUserGoal, signOut } from "./actions";
 import EditGoalModal from "@/app/components/modals/edit-goal-modal";
 import Button from "@/app/components/ui/button";
 import { Suspense } from "react";
 import Link from "next/link";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 
 export default async function Page() {
   const supabase = await createClient();

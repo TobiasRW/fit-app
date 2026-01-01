@@ -1,9 +1,9 @@
 import { getAllPlans } from "../actions";
 import Link from "next/link";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 import { Suspense } from "react";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
-import WorkoutCard from "@/app/components/workout-card";
+import WorkoutCard from "@/app/components/cards/workout-card";
 
 export default function Page() {
   return (

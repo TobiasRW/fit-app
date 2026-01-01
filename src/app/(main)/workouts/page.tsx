@@ -1,8 +1,8 @@
 import CreateWorkoutModal from "@/app/components/modals/create-workout-modal";
-import WorkoutCard from "../../components/workout-card";
+import WorkoutCard from "../../components/cards/workout-card";
 import { getUserWorkoutPlans } from "./actions";
 import { Suspense } from "react";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 
 export default async function Page() {
   return (

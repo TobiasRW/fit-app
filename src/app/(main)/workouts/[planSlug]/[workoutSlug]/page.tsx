@@ -4,12 +4,12 @@ import {
   getExercisesFromWorkout,
   updateWorkoutName,
 } from "../../actions";
-import ExerciseCard from "@/app/components/exercise-card";
+import ExerciseCard from "@/app/components/cards/exercise-card";
 import EditNameModal from "@/app/components/modals/edit-name-modal";
 import Link from "next/link";
 import { CaretLeftIcon, PencilIcon } from "@phosphor-icons/react/dist/ssr";
 import { Suspense } from "react";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 
 export default async function Page({
   params,

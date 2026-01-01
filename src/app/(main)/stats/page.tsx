@@ -11,7 +11,7 @@ import {
   getUserSquatPR,
   getWorkoutTimeStats,
 } from "./actions";
-import ErrorCard from "@/app/components/error-card";
+import ErrorCard from "@/app/components/cards/error-card";
 import { toZonedTime } from "date-fns-tz";
 
 const prDefinitions = [

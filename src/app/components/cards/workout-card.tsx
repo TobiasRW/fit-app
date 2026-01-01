@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import Button from "./ui/button";
+import Button from "../ui/button";
 import { useActionState, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -10,9 +10,9 @@ import {
   deactivatePlan,
   softDeleteWorkoutPlan,
   softDeleteWorkout,
-} from "../(main)/workouts/actions";
+} from "../../(main)/workouts/actions";
 import Form from "next/form";
-import { InitialState } from "../types";
+import { InitialState } from "../../types";
 
 type CardVariant = "plan" | "workout" | "upcoming" | "history";
 
