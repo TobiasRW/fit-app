@@ -21,6 +21,29 @@ export async function getTotalCompletedWorkouts(): Promise<
   }
 }
 
+export async function getTotalCompletedWorkoutsThisYear(): Promise<
+  number | { error: string }
+> {
+  const { user, supabase } = await checkAuthentication();
+
+  const currentYear = new Date().getFullYear(); // Get the current year
+  const startOfYear = new Date(currentYear, 0, 1).toISOString(); // January 1st (default time is 00:00:00)
+  const endOfYear = new Date(currentYear, 11, 31, 23, 59, 59).toISOString(); // December 31st (set time to 23:59:59)
+
+  const { count, error } = await supabase
+    .from("completed_workouts")
+    .select("user_id", { count: "exact" })
+    .eq("user_id", user.id)
+    .gte("completed_date", startOfYear)
+    .lte("completed_date", endOfYear);
+
+  if (error) {
+    return { error: "Failed to load your completed workouts for this year" };
+  }
+
+  return count ? count : 0;
+}
+
 type DayOfWeekCount = {
   day: number; // 0 = Sunday, 1 = Monday, etc.
   count: number; // number of times user worked out on that weekday
