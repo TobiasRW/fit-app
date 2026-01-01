@@ -4,6 +4,7 @@ import ErrorCard from "@/app/components/cards/error-card";
 import { Suspense } from "react";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import WorkoutCard from "@/app/components/cards/workout-card";
+import LoadingPlans from "@/app/components/loaders/loading-plans";
 
 export default function Page() {
   return (
@@ -98,35 +99,6 @@ async function WorkoutPlans() {
             No archived plans found.
           </p>
         )}
-      </div>
-    </div>
-  );
-}
-
-function LoadingPlans() {
-  return (
-    <div className="space-y-8">
-      {/* Loading for Current Plans */}
-      <div>
-        <div className="mt-6 mb-4">
-          <h2 className="mb-2">Current Plans</h2>
-          <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
-        </div>
-        <div className="space-y-4">
-          <div className="bg-gray dark:bg-dark-gray flex h-26 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-4"></div>
-          <div className="bg-gray dark:bg-dark-gray flex h-26 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-4"></div>
-        </div>
-      </div>
-
-      {/* Loading for Archived Plans */}
-      <div>
-        <div className="mt-6 mb-4">
-          <h2 className="mb-2">Archived Plans</h2>
-          <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
-        </div>
-        <div className="space-y-4">
-          <div className="bg-gray dark:bg-dark-gray flex h-26 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-4"></div>
-        </div>
       </div>
     </div>
   );

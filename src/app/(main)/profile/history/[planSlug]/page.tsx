@@ -4,6 +4,7 @@ import ErrorCard from "@/app/components/cards/error-card";
 import { Suspense } from "react";
 import Link from "next/link";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
+import LoadingWorkoutHistory from "@/app/components/loaders/loading-workout-history";
 
 export default async function Page({
   params,
@@ -21,7 +22,7 @@ export default async function Page({
         <h1 className="text-4xl font-bold">Workout History</h1>
       </section>
 
-      <Suspense fallback={<LoadingWorkouts />}>
+      <Suspense fallback={<LoadingWorkoutHistory />}>
         <CompletedExercises planSlug={planSlug} />
       </Suspense>
     </main>
@@ -63,21 +64,5 @@ async function CompletedExercises({ planSlug }: { planSlug: string }) {
         )}
       </div>
     </section>
-  );
-}
-
-function LoadingWorkouts() {
-  return (
-    <div className="mt-8 space-y-4">
-      <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-        <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
-      </div>
-      <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-        <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
-      </div>
-      <div className="bg-gray dark:bg-dark-gray flex h-10 animate-pulse flex-col justify-center overflow-hidden rounded-lg p-2 drop-shadow-md">
-        <div className="bg-gray dark:bg-dark-gray mx-auto h-2 w-2/3 animate-pulse rounded"></div>
-      </div>
-    </div>
   );
 }

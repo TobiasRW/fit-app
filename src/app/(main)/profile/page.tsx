@@ -6,6 +6,7 @@ import Button from "@/app/components/ui/button";
 import { Suspense } from "react";
 import Link from "next/link";
 import ErrorCard from "@/app/components/cards/error-card";
+import LoadingGoal from "@/app/components/loaders/loading-goal";
 
 export default async function Page() {
   const supabase = await createClient();
@@ -67,15 +68,6 @@ async function GoalSection() {
       <div className="mt-2 flex items-center justify-center">
         <EditGoalModal goal={goal.workout_goal_per_week} />
       </div>
-    </div>
-  );
-}
-
-function LoadingGoal() {
-  return (
-    <div className="flex flex-col items-center justify-center space-y-4">
-      <div className="bg-gray dark:bg-dark-gray h-14 w-14 animate-pulse rounded-lg"></div>
-      <div className="bg-gray dark:bg-dark-gray h-4 w-32 animate-pulse rounded-lg"></div>
     </div>
   );
 }
