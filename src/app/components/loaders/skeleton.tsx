@@ -5,6 +5,9 @@ type Props = {
   children?: React.ReactNode;
   pulse?: boolean;
   transparent?: boolean;
+  offsetTop?: number;
+  offsetBottom?: number;
+  centered?: boolean;
 };
 
 export default function Skeleton({
@@ -13,15 +16,20 @@ export default function Skeleton({
   rounded = 8,
   pulse = true,
   transparent = false,
+  offsetBottom = 0,
+  offsetTop = 0,
+  centered = false,
   children,
 }: Props) {
   return (
     <div
-      className={`flex items-center justify-center ${pulse ? "animate-pulse" : ""} ${transparent ? "" : "bg-gray dark:bg-dark-gray"} `}
+      className={` ${pulse ? "animate-pulse" : ""} ${transparent ? "" : "bg-gray dark:bg-dark-gray"} ${centered ? "flex items-center justify-center" : ""}`}
       style={{
         width: width === "full" ? "100%" : width,
         height: height === "full" ? "100%" : height,
         borderRadius: rounded === "full" ? "9999px" : rounded,
+        paddingTop: offsetTop,
+        paddingBottom: offsetBottom,
       }}
     >
       {children ? children : null}

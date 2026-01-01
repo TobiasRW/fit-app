@@ -13,6 +13,10 @@ import {
 } from "./actions";
 import ErrorCard from "@/app/components/cards/error-card";
 import { toZonedTime } from "date-fns-tz";
+import LoadingTimeOfDay from "@/app/components/loaders/loading-time-of-day";
+import Skeleton from "@/app/components/loaders/skeleton";
+import LoadingGoalCompletion from "@/app/components/loaders/loading-goal-completion";
+import LoadingBarChart from "@/app/components/loaders/loading-bar-chart";
 
 const prDefinitions = [
   { name: "Bench Press", fetch: getUserBenchPressPR },
@@ -29,14 +33,14 @@ export default async function Page() {
         <section className="mt-6">
           <div className="flex flex-col gap-6">
             <div className="flex gap-6">
-              <Suspense fallback={<LoadingTotalSquare />}>
+              <Suspense fallback={<Skeleton height={160} />}>
                 <TotalSquare />
               </Suspense>
-              <Suspense fallback={<LoadingStreakSquare />}>
+              <Suspense fallback={<Skeleton height={160} />}>
                 <StreakSquare />
               </Suspense>
             </div>
-            <Suspense fallback={<LoadingLongestStreak />}>
+            <Suspense fallback={<Skeleton height={56} />}>
               <LongestStreak />
             </Suspense>
           </div>
@@ -50,14 +54,14 @@ export default async function Page() {
           <p className="text-foreground/50 mt-1 text-xs italic">
             This is determined by the midpoint of your workouts.
           </p>
-          <Suspense fallback={<LoadingTimeOfDayChart />}>
+          <Suspense fallback={<LoadingTimeOfDay />}>
             <TimeOfDayChart />
           </Suspense>
         </section>
         <section className="mt-10">
           <h3 className="mb-2 text-xl font-medium"> This year</h3>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
-          <Suspense fallback={<LoadingWorkoutCompletion />}>
+          <Suspense fallback={<LoadingGoalCompletion />}>
             <WorkoutYearCompletion />
           </Suspense>
         </section>
@@ -67,7 +71,7 @@ export default async function Page() {
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
           <div className="mt-4 flex items-center justify-between gap-4">
             {prDefinitions.map((def) => (
-              <Suspense key={def.name} fallback={<LoadingPR />}>
+              <Suspense key={def.name} fallback={<Skeleton height={104} />}>
                 <PRCard name={def.name} fetch={def.fetch} />
               </Suspense>
             ))}
@@ -249,37 +253,38 @@ async function BarChart() {
     percentage: totalWorkouts > 0 ? (d.count / totalWorkouts) * 100 : 0,
   }));
 
+  // Find the maximum percentage to scale all bars relative to it
+  const maxPercentage = Math.max(...dayPercentages.map((d) => d.percentage));
+
   return (
-    <div className="mt-10">
-      <h2 className="mb-4 text-lg font-semibold">Most active days</h2>
+    <div className="mt-10 flex h-40 flex-col justify-between">
+      <h2 className="text-lg font-semibold">Most active days</h2>
       <div className="">
-        <div className="relative mx-auto flex max-h-80 w-full items-end justify-between gap-2">
+        <div className="relative mx-auto flex h-32 w-full items-end justify-between gap-2">
           {dayPercentages.map((day, i) => (
             <div
               key={day.day}
               className="flex h-full flex-col items-center justify-end"
             >
-              <div className="mb-2">
+              <div className="mb-2 flex h-full flex-col justify-end">
                 <p className="text-center text-xs font-light italic">
                   {day.percentage.toFixed(0)}%
                 </p>
                 <div
-                  className="bg-green w-8 rounded-t"
+                  className="bg-green w-8 rounded"
                   style={{
-                    height: `${day.percentage * 1.5}px`,
-                    minHeight: "0px",
+                    height: `${maxPercentage > 0 ? (day.percentage / maxPercentage) * 100 : 0}%`,
                   }}
                   title={`${day.percentage.toFixed(1)}%`}
                 />
               </div>
-              <div className="-rotate-45">
+              <div className="">
                 <span className="mt-2 text-xs font-light">
                   {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
                 </span>
               </div>
             </div>
           ))}
-          <div className="border-green absolute bottom-8 w-full border-b"></div>
         </div>
       </div>
     </div>
@@ -360,103 +365,6 @@ async function LongestStreak() {
           {streak?.streak && streak.streak > 0 ? "🏆" : "😴"}
         </span>
       </p>
-    </div>
-  );
-}
-
-function LoadingTimeOfDayChart() {
-  const labels = [
-    { label: "Morning" },
-    { label: "Afternoon" },
-    { label: "Evening" },
-    { label: "Night" },
-  ];
-
-  return (
-    <div className="mt-4 w-10/12 animate-pulse">
-      <div className="space-y-3">
-        {labels.map((interval, i) => (
-          <div key={i} className="">
-            <div className="text-foreground/50 flex items-center justify-between text-sm">
-              <span className="font-medium">{interval.label}</span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div
-                className="bg-gray dark:bg-dark-gray h-3 rounded"
-                style={{ width: `${Math.random() * 80 + 20}%` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function LoadingLongestStreak() {
-  return (
-    <div className="bg-gray/50 dark:bg-dark-gray/50 h-14 w-full animate-pulse rounded-lg" />
-  );
-}
-
-function LoadingPR() {
-  return (
-    <div className="bg-gray/50 dark:bg-dark-gray/50 h-26 w-full animate-pulse rounded-lg" />
-  );
-}
-
-function LoadingStreakSquare() {
-  return (
-    <div className="bg-gray/50 dark:bg-dark-gray/50 h-40 w-full animate-pulse rounded-lg" />
-  );
-}
-
-function LoadingTotalSquare() {
-  return (
-    <div className="bg-faded-green h-40 w-full animate-pulse rounded-lg" />
-  );
-}
-
-function LoadingBarChart() {
-  return (
-    <div className="mt-10 h-40 w-full animate-pulse rounded-lg">
-      <div className="relative flex h-full items-end justify-between p-2">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex h-full flex-col items-center justify-end"
-          >
-            <div className="mb-2">
-              <div
-                className="bg-gray dark:bg-dark-gray w-8 rounded-t"
-                style={{
-                  height: `${Math.random() * 100}px`,
-                  minHeight: "0px",
-                }}
-                title={`${Math.random().toFixed(1)}%`}
-              />
-            </div>
-            <div className="border-gray dark:border-dark-gray absolute bottom-4 w-full border-b"></div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function LoadingWorkoutCompletion() {
-  return (
-    <div className="mt-4 animate-pulse">
-      <p className="text-gray dark:text-dark-gray mb-2 font-light italic">
-        25 / 156 workouts completed
-      </p>
-      <div className="bg-foreground/10 relative h-3 w-full rounded-sm">
-        <div
-          className="bg-gray dark:bg-dark-gray absolute inset-0 rounded-sm"
-          style={{ width: `${Math.floor(Math.random() * 100)}%` }}
-        ></div>
-      </div>
     </div>
   );
 }
