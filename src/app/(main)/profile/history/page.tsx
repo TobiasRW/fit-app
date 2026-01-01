@@ -4,7 +4,7 @@ import ErrorCard from "@/app/components/cards/error-card";
 import { Suspense } from "react";
 import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import WorkoutCard from "@/app/components/cards/workout-card";
-import LoadingPlans from "@/app/components/loaders/loading-plans";
+import LoadingPlansHistory from "@/app/components/loaders/loading-plans-history";
 
 export default function Page() {
   return (
@@ -17,7 +17,7 @@ export default function Page() {
       </section>
 
       <section className="relative mt-6 space-y-4">
-        <Suspense fallback={<LoadingPlans />}>
+        <Suspense fallback={<LoadingPlansHistory />}>
           <WorkoutPlans />
         </Suspense>
       </section>

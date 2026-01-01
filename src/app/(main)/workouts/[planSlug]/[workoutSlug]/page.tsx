@@ -7,9 +7,10 @@ import {
 import ExerciseCard from "@/app/components/cards/exercise-card";
 import EditNameModal from "@/app/components/modals/edit-name-modal";
 import Link from "next/link";
-import { CaretLeftIcon, PencilIcon } from "@phosphor-icons/react/dist/ssr";
+import { CaretLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { Suspense } from "react";
 import ErrorCard from "@/app/components/cards/error-card";
+import LoadingExercises from "@/app/components/loaders/loading-exercises";
 
 export default async function Page({
   params,
@@ -25,7 +26,7 @@ export default async function Page({
       </Link>
 
       {/* Single Suspense boundary for all content */}
-      <Suspense fallback={<WorkoutContentLoading />}>
+      <Suspense fallback={<LoadingExercises />}>
         <WorkoutContent planSlug={planSlug} workoutSlug={workoutSlug} />
       </Suspense>
     </main>
@@ -109,33 +110,6 @@ async function WorkoutContent({
           workoutId={workout.id}
         />
       )}
-    </>
-  );
-}
-
-function WorkoutContentLoading() {
-  return (
-    <>
-      {/* Header skeleton */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-gray dark:text-dark-gray animate-pulse text-4xl font-bold">
-          Workout
-        </h1>
-        <PencilIcon size={20} className="text-green" />
-      </div>
-
-      {/* Exercises skeleton */}
-      <div className="mt-4">
-        <h2 className="text-2xl font-semibold">Exercises</h2>
-        <div className="mt-4 space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-gray dark:bg-dark-gray h-18 animate-pulse rounded-lg"
-            />
-          ))}
-        </div>
-      </div>
     </>
   );
 }

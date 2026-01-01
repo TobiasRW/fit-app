@@ -3,6 +3,7 @@ import WorkoutCard from "../../components/cards/workout-card";
 import { getUserWorkoutPlans } from "./actions";
 import { Suspense } from "react";
 import ErrorCard from "@/app/components/cards/error-card";
+import LoadingPlans from "@/app/components/loaders/loading-plans";
 
 export default async function Page() {
   return (
@@ -12,7 +13,7 @@ export default async function Page() {
         You can have a maximum of 4 plans
       </p>
 
-      <Suspense fallback={<WorkoutPlansLoading />}>
+      <Suspense fallback={<LoadingPlans />}>
         <WorkoutPlansList />
       </Suspense>
     </main>
@@ -61,20 +62,5 @@ async function WorkoutPlansList() {
       </div>
       <CreateWorkoutModal />
     </>
-  );
-}
-
-function WorkoutPlansLoading() {
-  return (
-    <div className="mt-8">
-      <div className="grid grid-cols-1 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="bg-gray dark:bg-dark-gray h-26 animate-pulse rounded-lg"
-          />
-        ))}
-      </div>
-    </div>
   );
 }
