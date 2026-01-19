@@ -1,22 +1,20 @@
 import { Suspense } from "react";
-import { getUserGoal } from "../profile/actions";
 import {
-  getCurrentStreak,
-  getLongestStreak,
-  getTotalCompletedWorkouts,
-  getTotalCompletedWorkoutsThisYear,
   getUserBenchPressPR,
-  getUserDayOfWeekCounts,
   getUserDeadliftPR,
   getUserSquatPR,
-  getWorkoutTimeStats,
 } from "./actions";
-import ErrorCard from "@/app/components/cards/error-card";
-import { toZonedTime } from "date-fns-tz";
 import LoadingTimeOfDay from "@/app/components/loaders/loading-time-of-day";
 import Skeleton from "@/app/components/loaders/skeleton";
 import LoadingGoalCompletion from "@/app/components/loaders/loading-goal-completion";
 import LoadingBarChart from "@/app/components/loaders/loading-bar-chart";
+import { PRSquare } from "@/app/components/stats/pr-square";
+import { YearlyWorkoutCompletion } from "@/app/components/stats/yearly-workout-completion";
+import { TimeOfDayPercentage } from "@/app/components/stats/time-of-day-percentage";
+import { WeekdayPercentage } from "@/app/components/stats/weekday-percentage";
+import { TotalWorkouts } from "@/app/components/stats/total-workouts";
+import { Streak } from "@/app/components/stats/streak";
+import { LongestStreak } from "@/app/components/stats/longest-streak";
 
 const prDefinitions = [
   { name: "Bench Press", fetch: getUserBenchPressPR },
@@ -34,10 +32,10 @@ export default async function Page() {
           <div className="flex flex-col gap-6">
             <div className="flex gap-6">
               <Suspense fallback={<Skeleton height={160} />}>
-                <TotalSquare />
+                <TotalWorkouts />
               </Suspense>
               <Suspense fallback={<Skeleton height={160} />}>
-                <StreakSquare />
+                <Streak />
               </Suspense>
             </div>
             <Suspense fallback={<Skeleton height={56} />}>
@@ -45,7 +43,7 @@ export default async function Page() {
             </Suspense>
           </div>
           <Suspense fallback={<LoadingBarChart />}>
-            <BarChart />
+            <WeekdayPercentage />
           </Suspense>
         </section>
         <section className="mt-10">
@@ -55,14 +53,14 @@ export default async function Page() {
             This is determined by the midpoint of your workouts.
           </p>
           <Suspense fallback={<LoadingTimeOfDay />}>
-            <TimeOfDayChart />
+            <TimeOfDayPercentage />
           </Suspense>
         </section>
         <section className="mt-10">
           <h3 className="mb-2 text-xl font-medium"> This year</h3>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
           <Suspense fallback={<LoadingGoalCompletion />}>
-            <WorkoutYearCompletion />
+            <YearlyWorkoutCompletion />
           </Suspense>
         </section>
 
@@ -72,299 +70,12 @@ export default async function Page() {
           <div className="mt-4 flex items-center justify-between gap-4">
             {prDefinitions.map((def) => (
               <Suspense key={def.name} fallback={<Skeleton height={104} />}>
-                <PRCard name={def.name} fetch={def.fetch} />
+                <PRSquare name={def.name} fetch={def.fetch} />
               </Suspense>
             ))}
           </div>
         </section>
       </main>
     </>
-  );
-}
-
-async function PRCard({
-  name,
-  fetch,
-}: {
-  name: string;
-  fetch: () => Promise<number | { error: string } | null>;
-}) {
-  const pr = await fetch();
-
-  if (typeof pr === "object" && pr !== null && "error" in pr) {
-    return (
-      <div className="h-26 w-full">
-        <ErrorCard errorText={"Failed to Load PR"} variant="secondary" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-26 w-full flex-col items-center justify-between rounded-lg p-2 shadow-lg">
-      <div className="justify-center text-center">
-        <p className="mb-4 text-sm">{name}</p>
-        <p className={`text-4xl ${!pr ? "text-lg" : ""}`}>
-          {pr?.toString() || "No PR Yet"}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-async function WorkoutYearCompletion() {
-  const totalWorkoutsThisYear = await getTotalCompletedWorkoutsThisYear();
-  const goal = await getUserGoal();
-
-  if (
-    typeof totalWorkoutsThisYear === "object" &&
-    "error" in totalWorkoutsThisYear
-  ) {
-    return (
-      <div className="mt-10 h-24 w-full">
-        <ErrorCard
-          errorText={"Failed to load your total workouts completed"}
-          variant="secondary"
-        />
-      </div>
-    );
-  }
-  if ("error" in goal) {
-    return (
-      <div className="mt-10 h-24 w-full">
-        <ErrorCard errorText={"Failed to load your goal"} variant="secondary" />
-      </div>
-    );
-  }
-
-  const totalYearGoal = goal.workout_goal_per_week * 52;
-
-  return (
-    <div className="mt-4">
-      <p className="mb-2 font-light italic">
-        {totalWorkoutsThisYear} / {totalYearGoal} workouts completed
-      </p>
-      <div className="bg-faded-green relative h-3 w-full rounded-sm">
-        <div
-          className="bg-green absolute inset-0 rounded-sm"
-          style={{ width: `${(totalWorkoutsThisYear / totalYearGoal) * 100}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-}
-
-async function TimeOfDayChart() {
-  const timeOfDayStats = await getWorkoutTimeStats();
-
-  if ("error" in timeOfDayStats) {
-    return (
-      <div className="mt-4 h-26 w-full">
-        <ErrorCard
-          errorText={"Failed to load your workout time stats"}
-          variant="secondary"
-        />
-      </div>
-    );
-  }
-
-  const timeIntervals = [
-    { label: "Early Morning", start: 5, end: 8 },
-    { label: "Morning", start: 9, end: 11 },
-    { label: "Afternoon", start: 12, end: 17 },
-    { label: "Evening", start: 18, end: 20 },
-    { label: "Late Evening", start: 21, end: 23 },
-    { label: "Night", start: 0, end: 4 },
-  ];
-
-  // calculate percentages of each time interval
-  const totalWorkouts = timeOfDayStats.length;
-  const intervalData = timeIntervals.map((interval) => {
-    const count = timeOfDayStats.filter((workout) => {
-      const startTime = new Date(workout.workout_start_time);
-      const endTime = new Date(workout.completed_at);
-
-      // Calculate midpoint of the workout
-      const midpoint = new Date((startTime.getTime() + endTime.getTime()) / 2);
-      const localMidpoint = toZonedTime(midpoint, "Europe/Copenhagen");
-      const hour = localMidpoint.getHours();
-
-      return hour >= interval.start && hour <= interval.end;
-    }).length;
-
-    return {
-      ...interval,
-      count,
-      percentage: totalWorkouts > 0 ? (count / totalWorkouts) * 100 : 0,
-    };
-  });
-
-  // Filter out intervals with 0 workouts for cleaner display
-  const activeIntervals = intervalData.filter((interval) => interval.count > 0);
-
-  return (
-    <div className="mt-4 w-10/12">
-      {totalWorkouts > 0 ? (
-        <div className="space-y-3">
-          {activeIntervals.map((interval) => (
-            <div key={interval.label} className="">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">
-                  {interval.label}{" "}
-                  <span className="text-xs italic">
-                    ({interval.start}:00 - {interval.end}:59)
-                  </span>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div
-                  className="h-3 rounded bg-green-500"
-                  style={{ width: `${interval.percentage}%` }}
-                />
-                <span className="text-sm font-light italic">
-                  {interval.percentage.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-foreground/50 py-4 text-center">
-          No workouts completed yet.
-        </p>
-      )}
-    </div>
-  );
-}
-
-async function BarChart() {
-  const dayCounts = await getUserDayOfWeekCounts();
-  if (!Array.isArray(dayCounts)) {
-    return (
-      <div className="mt-10 h-40 w-full">
-        <ErrorCard errorText={dayCounts.error} variant="secondary" />
-      </div>
-    );
-  }
-  // Calculate percentages
-  const totalWorkouts = dayCounts.reduce((sum, d) => sum + d.count, 0);
-  const dayPercentages = dayCounts.map((d) => ({
-    ...d,
-    percentage: totalWorkouts > 0 ? (d.count / totalWorkouts) * 100 : 0,
-  }));
-
-  // Find the maximum percentage to scale all bars relative to it
-  const maxPercentage = Math.max(...dayPercentages.map((d) => d.percentage));
-
-  return (
-    <div className="mt-10 flex h-40 flex-col justify-between">
-      <h2 className="text-lg font-semibold">Most active days</h2>
-      <div className="">
-        <div className="relative mx-auto flex h-32 w-full items-end justify-between gap-2">
-          {dayPercentages.map((day, i) => (
-            <div
-              key={day.day}
-              className="flex h-full flex-col items-center justify-end"
-            >
-              <div className="mb-2 flex h-full flex-col items-center justify-end">
-                <p className="text-background absolute text-center text-xs font-normal italic">
-                  {day.percentage.toFixed(0)}%
-                </p>
-                <div
-                  className="bg-green w-8 rounded"
-                  style={{
-                    height: `${maxPercentage > 0 ? (day.percentage / maxPercentage) * 100 : 0}%`,
-                  }}
-                  title={`${day.percentage.toFixed(1)}%`}
-                />
-              </div>
-              <div className="">
-                <span className="mt-2 text-xs font-light">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-async function TotalSquare() {
-  const totalWorkouts = await getTotalCompletedWorkouts();
-
-  if (
-    typeof totalWorkouts === "object" &&
-    totalWorkouts !== null &&
-    "error" in totalWorkouts
-  ) {
-    return (
-      <div className="h-40 w-full">
-        <ErrorCard
-          errorText={totalWorkouts.error ?? "An unknown error occurred."}
-          variant="secondary"
-        />
-      </div>
-    );
-  }
-  return (
-    <div className="bg-green flex h-40 w-full flex-col items-center justify-between rounded-lg p-2 text-white shadow-lg">
-      <p className="text-lg">Total Workouts</p>
-      <p className="text-6xl">{totalWorkouts.toString() || "0"}</p>
-      <p className="text-3xl">💪</p>
-    </div>
-  );
-}
-
-async function StreakSquare() {
-  const streak = await getCurrentStreak();
-
-  if ("error" in streak) {
-    return (
-      <div className="h-40 w-full">
-        <ErrorCard
-          errorText={streak.error ?? "An unknown error occurred."}
-          variant="secondary"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-40 w-full flex-col items-center justify-between rounded-lg p-2 shadow-lg">
-      <p className="text-lg">Week streak</p>
-      <p className="text-5xl">{streak.streak}</p>
-      <p className="text-3xl">
-        {streak?.streak && streak.streak > 0 ? "🔥" : "😴"}
-      </p>
-    </div>
-  );
-}
-
-async function LongestStreak() {
-  const streak = await getLongestStreak();
-
-  if ("error" in streak) {
-    return (
-      <div className="h-20 w-full">
-        <ErrorCard
-          errorText={streak.error ?? "An unknown error occurred."}
-          variant="secondary"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-gray dark:bg-dark-gray text-foreground flex h-14 items-center justify-between rounded-lg px-4 shadow-lg">
-      <p className="text-lg">Longest Streak: </p>
-      <p className="text-3xl">
-        {streak.streak}{" "}
-        <span className="ml-2">
-          {streak?.streak && streak.streak > 0 ? "🏆" : "😴"}
-        </span>
-      </p>
-    </div>
   );
 }
