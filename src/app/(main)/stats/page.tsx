@@ -266,8 +266,8 @@ async function BarChart() {
               key={day.day}
               className="flex h-full flex-col items-center justify-end"
             >
-              <div className="mb-2 flex h-full flex-col justify-end">
-                <p className="text-center text-xs font-light italic">
+              <div className="mb-2 flex h-full flex-col items-center justify-end">
+                <p className="text-background absolute text-center text-xs font-normal italic">
                   {day.percentage.toFixed(0)}%
                 </p>
                 <div
