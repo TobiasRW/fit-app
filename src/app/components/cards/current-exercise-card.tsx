@@ -74,7 +74,6 @@ export default function CurrentExerciseCard({
       setIsSuccess(true);
       const timer = setTimeout(() => {
         setIsSuccess(false);
-        setIsOpen(false);
       }, 2000);
       return () => clearTimeout(timer);
     }
