@@ -2,8 +2,8 @@ import { getCurrentStreak } from "@/app/(main)/stats/actions";
 import ErrorCard from "../cards/error-card";
 import StatSquare from "../ui/stat-square";
 
-export async function Streak() {
-  const streak = await getCurrentStreak();
+export async function Streak({ userId }: { userId: string }) {
+  const streak = await getCurrentStreak(userId);
 
   if ("error" in streak) {
     return (

@@ -15,6 +15,8 @@ import { WeekdayPercentage } from "@/app/components/stats/weekday-percentage";
 import { TotalWorkouts } from "@/app/components/stats/total-workouts";
 import { Streak } from "@/app/components/stats/streak";
 import { LongestStreak } from "@/app/components/stats/longest-streak";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 const prDefinitions = [
   { name: "Bench Press", fetch: getUserBenchPressPR },
@@ -23,6 +25,11 @@ const prDefinitions = [
 ];
 
 export default async function Page() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
   return (
     <>
       <main className="mx-auto mt-10 w-11/12 pb-30">
@@ -32,18 +39,18 @@ export default async function Page() {
           <div className="flex flex-col gap-6">
             <div className="flex gap-6">
               <Suspense fallback={<Skeleton height={160} />}>
-                <TotalWorkouts />
+                <TotalWorkouts userId={user.id} />
               </Suspense>
               <Suspense fallback={<Skeleton height={160} />}>
-                <Streak />
+                <Streak userId={user.id} />
               </Suspense>
             </div>
             <Suspense fallback={<Skeleton height={56} />}>
-              <LongestStreak />
+              <LongestStreak userId={user.id} />
             </Suspense>
           </div>
           <Suspense fallback={<LoadingBarChart />}>
-            <WeekdayPercentage />
+            <WeekdayPercentage userId={user.id} />
           </Suspense>
         </section>
         <section className="mt-10">
@@ -53,14 +60,14 @@ export default async function Page() {
             This is determined by the midpoint of your workouts.
           </p>
           <Suspense fallback={<LoadingTimeOfDay />}>
-            <TimeOfDayPercentage />
+            <TimeOfDayPercentage userId={user.id} />
           </Suspense>
         </section>
         <section className="mt-10">
           <h3 className="mb-2 text-xl font-medium"> This year</h3>
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
           <Suspense fallback={<LoadingGoalCompletion />}>
-            <YearlyWorkoutCompletion />
+            <YearlyWorkoutCompletion userId={user.id} />
           </Suspense>
         </section>
 
@@ -70,7 +77,7 @@ export default async function Page() {
           <div className="mt-4 flex items-center justify-between gap-4">
             {prDefinitions.map((def) => (
               <Suspense key={def.name} fallback={<Skeleton height={104} />}>
-                <PRSquare name={def.name} fetch={def.fetch} />
+                <PRSquare name={def.name} fetch={def.fetch} userId={user.id} />
               </Suspense>
             ))}
           </div>

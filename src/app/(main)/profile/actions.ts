@@ -6,14 +6,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 // Function to get the users goal
-export async function getUserGoal(): Promise<UserGoal | { error: string }> {
+export async function getUserGoal(
+  userId: string,
+): Promise<UserGoal | { error: string }> {
   try {
-    const { user, supabase } = await checkAuthentication();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from("user_settings")
       .select("workout_goal_per_week")
-      .eq("id", user.id)
+      .eq("id", userId)
       .single();
 
     if (error) {

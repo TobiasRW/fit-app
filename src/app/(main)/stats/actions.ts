@@ -1,17 +1,18 @@
 import { Streak, WorkoutTimeStat } from "@/app/types";
 import { checkAuthentication } from "@/utils/helpers/helpers";
+import { createClient } from "@/utils/supabase/server";
 import { getDay } from "date-fns";
 
-export async function getTotalCompletedWorkouts(): Promise<
-  number | { error: string }
-> {
+export async function getTotalCompletedWorkouts(
+  userId: string,
+): Promise<number | { error: string }> {
   {
-    const { user, supabase } = await checkAuthentication();
+    const supabase = await createClient();
 
     const { count, error } = await supabase
       .from("completed_workouts")
       .select("user_id", { count: "exact" })
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
 
     if (error) {
       return { error: "Failed to load your completed workouts" };
@@ -21,10 +22,10 @@ export async function getTotalCompletedWorkouts(): Promise<
   }
 }
 
-export async function getTotalCompletedWorkoutsThisYear(): Promise<
-  number | { error: string }
-> {
-  const { user, supabase } = await checkAuthentication();
+export async function getTotalCompletedWorkoutsThisYear(
+  userId: string,
+): Promise<number | { error: string }> {
+  const supabase = await createClient();
 
   const currentYear = new Date().getFullYear(); // Get the current year
   const startOfYear = new Date(currentYear, 0, 1).toISOString(); // January 1st (default time is 00:00:00)
@@ -33,7 +34,7 @@ export async function getTotalCompletedWorkoutsThisYear(): Promise<
   const { count, error } = await supabase
     .from("completed_workouts")
     .select("user_id", { count: "exact" })
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .gte("completed_date", startOfYear)
     .lte("completed_date", endOfYear);
 
@@ -49,16 +50,16 @@ type DayOfWeekCount = {
   count: number; // number of times user worked out on that weekday
 };
 
-export async function getUserDayOfWeekCounts(): Promise<
-  DayOfWeekCount[] | { error: string }
-> {
-  const { user, supabase } = await checkAuthentication();
+export async function getUserDayOfWeekCounts(
+  userId: string,
+): Promise<DayOfWeekCount[] | { error: string }> {
+  const supabase = await createClient();
 
   // Fetch all completed workouts
   const { data, error } = await supabase
     .from("completed_workouts")
     .select("completed_date")
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (error) {
     console.error("Error fetching completed workouts:", error);
@@ -87,13 +88,13 @@ export async function getUserDayOfWeekCounts(): Promise<
 }
 
 // Function to get time of day stats for completed workouts
-export async function getWorkoutTimeStats(): Promise<
-  WorkoutTimeStat[] | { error: string }
-> {
-  const { user, supabase } = await checkAuthentication();
+export async function getWorkoutTimeStats(
+  userId: string,
+): Promise<WorkoutTimeStat[] | { error: string }> {
+  const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("get_workout_time_stats", {
-    user_id_param: user.id,
+    user_id_param: userId,
   });
 
   if (error) {
@@ -105,11 +106,11 @@ export async function getWorkoutTimeStats(): Promise<
 }
 
 // Get current streak
-export async function getCurrentStreak(): Promise<Streak> {
-  const { user, supabase } = await checkAuthentication();
+export async function getCurrentStreak(userId: string): Promise<Streak> {
+  const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("get_current_streak", {
-    user_id_param: user.id,
+    user_id_param: userId,
   });
 
   if (error) return { streak: 0, error: "Failed to load current streak" };
@@ -117,20 +118,20 @@ export async function getCurrentStreak(): Promise<Streak> {
 }
 
 // Get longest streak
-export async function getLongestStreak(): Promise<Streak> {
-  const { user, supabase } = await checkAuthentication();
+export async function getLongestStreak(userId: string): Promise<Streak> {
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_longest_streak", {
-    user_id_param: user.id,
+    user_id_param: userId,
   });
 
   if (error) return { streak: 0, error: "Failed to load longest streak" };
   return { streak: data || 0 };
 }
 
-export async function getUserBenchPressPR(): Promise<
-  number | { error: string } | null
-> {
-  const { user, supabase } = await checkAuthentication();
+export async function getUserBenchPressPR(
+  userId: string,
+): Promise<number | { error: string } | null> {
+  const supabase = await createClient();
 
   const benchPressId = "e09e6102-0cd4-4b11-8774-4a7251b146a4";
 
@@ -138,7 +139,7 @@ export async function getUserBenchPressPR(): Promise<
   const { data: exercises, error: exercisesError } = await supabase
     .from("completed_exercises")
     .select("id")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("exercise_id", benchPressId);
 
   if (exercisesError) {
@@ -169,10 +170,10 @@ export async function getUserBenchPressPR(): Promise<
 }
 
 // Squat PR
-export async function getUserSquatPR(): Promise<
-  number | { error: string } | null
-> {
-  const { user, supabase } = await checkAuthentication();
+export async function getUserSquatPR(
+  userId: string,
+): Promise<number | { error: string } | null> {
+  const supabase = await createClient();
 
   const squatId = "8ec9d613-55e8-4598-b37b-7bb45ad0ab20";
 
@@ -180,7 +181,7 @@ export async function getUserSquatPR(): Promise<
   const { data: exercises, error: exercisesError } = await supabase
     .from("completed_exercises")
     .select("id")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("exercise_id", squatId);
 
   if (exercisesError) {
@@ -210,10 +211,10 @@ export async function getUserSquatPR(): Promise<
 }
 
 // Deadlift pr
-export async function getUserDeadliftPR(): Promise<
-  number | { error: string } | null
-> {
-  const { user, supabase } = await checkAuthentication();
+export async function getUserDeadliftPR(
+  userId: string,
+): Promise<number | { error: string } | null> {
+  const supabase = await createClient();
 
   const deadliftId = "aa9ccfd3-d333-40cc-a3df-ad6d3ce5c800";
 
@@ -221,7 +222,7 @@ export async function getUserDeadliftPR(): Promise<
   const { data: exercises, error: exercisesError } = await supabase
     .from("completed_exercises")
     .select("id")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("exercise_id", deadliftId);
 
   if (exercisesError) {

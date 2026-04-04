@@ -2,8 +2,8 @@ import { getWorkoutTimeStats } from "@/app/(main)/stats/actions";
 import ErrorCard from "../cards/error-card";
 import { toZonedTime } from "date-fns-tz";
 
-export async function TimeOfDayPercentage() {
-  const timeOfDayStats = await getWorkoutTimeStats();
+export async function TimeOfDayPercentage({ userId }: { userId: string }) {
+  const timeOfDayStats = await getWorkoutTimeStats(userId);
 
   if ("error" in timeOfDayStats) {
     return (
