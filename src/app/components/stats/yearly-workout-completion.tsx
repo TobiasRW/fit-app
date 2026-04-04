@@ -2,9 +2,11 @@ import { getUserGoal } from "@/app/(main)/profile/actions";
 import { getTotalCompletedWorkoutsThisYear } from "@/app/(main)/stats/actions";
 import ErrorCard from "../cards/error-card";
 
-export async function YearlyWorkoutCompletion() {
-  const totalWorkoutsThisYear = await getTotalCompletedWorkoutsThisYear();
-  const goal = await getUserGoal();
+export async function YearlyWorkoutCompletion({ userId }: { userId: string }) {
+  const [totalWorkoutsThisYear, goal] = await Promise.all([
+    getTotalCompletedWorkoutsThisYear(userId),
+    getUserGoal(userId),
+  ]);
 
   if (
     typeof totalWorkoutsThisYear === "object" &&

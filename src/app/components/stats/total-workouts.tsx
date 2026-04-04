@@ -2,8 +2,8 @@ import { getTotalCompletedWorkouts } from "@/app/(main)/stats/actions";
 import ErrorCard from "../cards/error-card";
 import StatSquare from "../ui/stat-square";
 
-export async function TotalWorkouts() {
-  const totalWorkouts = await getTotalCompletedWorkouts();
+export async function TotalWorkouts({ userId }: { userId: string }) {
+  const totalWorkouts = await getTotalCompletedWorkouts(userId);
 
   if (
     typeof totalWorkouts === "object" &&

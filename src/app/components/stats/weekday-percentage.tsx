@@ -1,8 +1,8 @@
 import { getUserDayOfWeekCounts } from "@/app/(main)/stats/actions";
 import ErrorCard from "../cards/error-card";
 
-export async function WeekdayPercentage() {
-  const dayCounts = await getUserDayOfWeekCounts();
+export async function WeekdayPercentage({ userId }: { userId: string }) {
+  const dayCounts = await getUserDayOfWeekCounts(userId);
   if (!Array.isArray(dayCounts)) {
     return (
       <div className="mt-10 h-40 w-full">

@@ -7,12 +7,17 @@ import { Suspense } from "react";
 import Link from "next/link";
 import ErrorCard from "@/app/components/cards/error-card";
 import LoadingGoal from "@/app/components/loaders/loading-goal";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   return (
     <>
@@ -35,7 +40,7 @@ export default async function Page() {
           </div>
           <div>
             <Suspense fallback={<LoadingGoal />}>
-              <GoalSection />
+              <GoalSection userId={user.id} />
             </Suspense>
           </div>
         </section>
@@ -47,8 +52,8 @@ export default async function Page() {
   );
 }
 
-async function GoalSection() {
-  const goal = await getUserGoal();
+async function GoalSection({ userId }: { userId: string }) {
+  const goal = await getUserGoal(userId);
 
   if ("error" in goal) {
     return (

@@ -11,12 +11,17 @@ import { getCurrentStreak } from "./stats/actions";
 import { getUserGoal } from "./profile/actions";
 import Skeleton from "../components/loaders/skeleton";
 import LoadingStatsSection from "../components/loaders/loading-stats-section";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   const currentWeekNumber = getISOWeek(new Date());
 
@@ -37,7 +42,7 @@ export default async function Home() {
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
         </div>
         <Suspense fallback={<Skeleton height={104} />}>
-          <WorkoutSection />
+          <WorkoutSection userId={user.id} />
         </Suspense>
       </section>
 
@@ -51,7 +56,7 @@ export default async function Home() {
         </div>
 
         <Suspense fallback={<LoadingStatsSection />}>
-          <StatsSection />
+          <StatsSection userId={user.id} />
         </Suspense>
       </section>
     </main>
@@ -59,8 +64,8 @@ export default async function Home() {
 }
 
 // Component to fetch and display the next workout
-async function WorkoutSection() {
-  const nextWorkout = await getNextWorkout();
+async function WorkoutSection({ userId }: { userId: string }) {
+  const nextWorkout = await getNextWorkout(userId);
 
   if (!nextWorkout) {
     return (
@@ -99,10 +104,12 @@ async function WorkoutSection() {
 }
 
 // Stats Section
-async function StatsSection() {
-  const thisWeeksWorkouts = await getWeeklyCompletedWorkouts();
-  const streak = await getCurrentStreak();
-  const goal = await getUserGoal();
+async function StatsSection({ userId }: { userId: string }) {
+  const [thisWeeksWorkouts, streak, goal] = await Promise.all([
+    getWeeklyCompletedWorkouts(userId),
+    getCurrentStreak(userId),
+    getUserGoal(userId),
+  ]);
 
   if ("error" in thisWeeksWorkouts) {
     return (
