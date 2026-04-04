@@ -8,7 +8,6 @@ import {
   getYear,
   startOfISOWeek,
 } from "date-fns";
-import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 
 export async function getNextWorkout(userId: string): Promise<UpcomingWorkout> {

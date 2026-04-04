@@ -35,7 +35,7 @@ export default function Loading() {
       </section>
 
       <section className="mt-10">
-        <h3 className="mb-2 text-xl font-medium">Your PR&#39;s</h3>
+        <h3 className="mb-2 text-xl font-medium">Your PRs</h3>
         <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
         <div className="mt-4 flex items-center justify-between gap-4">
           <Skeleton height={104} />

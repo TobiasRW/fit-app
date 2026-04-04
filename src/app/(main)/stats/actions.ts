@@ -1,25 +1,22 @@
 import { Streak, WorkoutTimeStat } from "@/app/types";
-import { checkAuthentication } from "@/utils/helpers/helpers";
 import { createClient } from "@/utils/supabase/server";
 import { getDay } from "date-fns";
 
 export async function getTotalCompletedWorkouts(
   userId: string,
 ): Promise<number | { error: string }> {
-  {
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    const { count, error } = await supabase
-      .from("completed_workouts")
-      .select("user_id", { count: "exact" })
-      .eq("user_id", userId);
+  const { count, error } = await supabase
+    .from("completed_workouts")
+    .select("user_id", { count: "exact" })
+    .eq("user_id", userId);
 
-    if (error) {
-      return { error: "Failed to load your completed workouts" };
-    }
-
-    return count ? count : 0;
+  if (error) {
+    return { error: "Failed to load your completed workouts" };
   }
+
+  return count ? count : 0;
 }
 
 export async function getTotalCompletedWorkoutsThisYear(
