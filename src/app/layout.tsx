@@ -25,6 +25,10 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/icon-192x192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -67,8 +71,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" type="image/x-icon" href="/icons/icon-192x192.png" />
         <meta name="theme-color" content="#1db954" />
       </head>
       <body className={`${plein.variable} ${archivo.variable} antialiased`}>
