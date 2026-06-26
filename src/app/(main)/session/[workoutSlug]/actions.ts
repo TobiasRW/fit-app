@@ -120,6 +120,10 @@ export async function saveCompletedWorkout(
 
     if (data.success) {
       revalidatePath(`/session/${workoutSlug}`);
+      revalidatePath("/");
+      revalidatePath("/stats");
+      revalidatePath("/profile/history");
+      revalidatePath("/profile/history/[planSlug]", "page");
       return { success: "Workout saved successfully" };
     } else {
       return { error: data.error || "Failed to save workout" };
@@ -159,6 +163,7 @@ export async function skipWorkout(
     }
 
     revalidatePath(`/session/${workoutSlug}`);
+    revalidatePath("/");
   } catch (error) {
     console.error("Error skipping workout:", error);
     return {

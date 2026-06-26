@@ -285,6 +285,7 @@ export async function addExerciseToWorkout(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    revalidatePath(`/session/${workoutSlug}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error adding exercise to workout:", error);
@@ -335,6 +336,8 @@ export async function updateExercise(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    // Keep the active workout session in sync when its exercises/sets change.
+    revalidatePath(`/session/${workoutSlug}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error updating exercise:", error);
@@ -513,6 +516,8 @@ export async function reorderWorkoutExercise(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    // Keep the active workout session in sync when its exercises/sets change.
+    revalidatePath(`/session/${workoutSlug}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error reordering exercise:", error);
@@ -556,6 +561,8 @@ export async function deleteExerciseFromWorkout(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    // Keep the active workout session in sync when its exercises/sets change.
+    revalidatePath(`/session/${workoutSlug}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error deleting exercise from workout:", error);
@@ -740,6 +747,8 @@ export async function softDeleteWorkoutExercise(
     }
 
     revalidatePath(`/workouts/${planSlug}/${workoutSlug}`);
+    // Keep the active workout session in sync when its exercises/sets change.
+    revalidatePath(`/session/${workoutSlug}`);
     return { success: true };
   } catch (error) {
     console.error("Unexpected error deleting exercise from workout:", error);

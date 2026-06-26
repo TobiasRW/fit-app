@@ -30,18 +30,21 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // supabase.auth.getClaims(). A simple mistake could make it very hard to
+  // debug issues with users being randomly logged out.
 
-  // IMPORTANT: DO NOT REMOVE auth.getUser()
+  // IMPORTANT: DO NOT REMOVE auth.getClaims(). Calling it here is what refreshes
+  // the auth token and writes the updated cookies onto supabaseResponse.
+  // getClaims() verifies the JWT signature against the project's public keys
+  // (locally when using asymmetric signing keys), so it's safe to trust here and
+  // avoids a network round-trip to the Auth server on every request.
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims ?? null;
 
   // Redirect to home if user is logged in and trying to access login or signup
   if (
-    user &&
+    claims &&
     (request.nextUrl.pathname.startsWith("/login") ||
       request.nextUrl.pathname.startsWith("/signup"))
   ) {
@@ -52,7 +55,7 @@ export async function updateSession(request: NextRequest) {
 
   // If the user is not logged in and trying to access a protected route,
   if (
-    !user &&
+    !claims &&
     !request.nextUrl.pathname.startsWith("/login") &&
     !request.nextUrl.pathname.startsWith("/signup") &&
     !request.nextUrl.pathname.startsWith("/auth")

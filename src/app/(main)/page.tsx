@@ -15,13 +15,15 @@ import { redirect } from "next/navigation";
 
 export default async function Home() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
 
-  if (!user) {
+  if (!claims) {
     redirect("/login");
   }
+
+  const userId = claims.sub;
+  const displayName = claims.user_metadata?.display_name as string | undefined;
 
   const currentWeekNumber = getISOWeek(new Date());
 
@@ -30,9 +32,7 @@ export default async function Home() {
       <section className="">
         <h1 className="text-4xl font-bold">
           Hey,{" "}
-          <span className="text-green">
-            {user?.user_metadata?.display_name || "user"}
-          </span>
+          <span className="text-green">{displayName || "user"}</span>
         </h1>
       </section>
 
@@ -42,7 +42,7 @@ export default async function Home() {
           <hr className="border-foreground/20 relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t" />
         </div>
         <Suspense fallback={<Skeleton height={104} />}>
-          <WorkoutSection userId={user.id} />
+          <WorkoutSection userId={userId} />
         </Suspense>
       </section>
 
@@ -56,7 +56,7 @@ export default async function Home() {
         </div>
 
         <Suspense fallback={<LoadingStatsSection />}>
-          <StatsSection userId={user.id} />
+          <StatsSection userId={userId} />
         </Suspense>
       </section>
     </main>

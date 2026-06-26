@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Your Next.js config options go here
-  // For example:
-  // experimental: { ... },
-  // images: { ... },
+  experimental: {
+    staleTimes: {
+      dynamic: 3600,
+      static: 300,
+    },
+  },
 };
 
 export default nextConfig;

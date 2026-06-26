@@ -11,11 +11,12 @@ export function generateSlug(name: string): string {
 // Authentication check
 export async function checkAuthentication() {
   const supabase = await createClient();
-  const user = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims.sub;
 
-  if (!user.data.user) {
+  if (!userId) {
     throw new Error("User not authenticated");
   }
 
-  return { supabase, user: user.data.user };
+  return { supabase, user: { id: userId } };
 }

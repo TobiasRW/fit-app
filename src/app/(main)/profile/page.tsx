@@ -11,20 +11,23 @@ import { redirect } from "next/navigation";
 
 export default async function Page() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
 
-  if (!user) {
+  if (!claims) {
     redirect("/login");
   }
+
+  const userId = claims.sub;
+  const displayName = claims.user_metadata?.display_name as string | undefined;
+  const email = claims.email as string | undefined;
 
   return (
     <>
       <main className="mx-auto mt-10 w-11/12">
         <h1 className="text-4xl font-bold">Your Profile</h1>
         <section className="mt-10 flex flex-col items-center justify-center">
-          <Avatar user={user!} />
+          <Avatar displayName={displayName} email={email} />
           <Link href="/profile/history" className="mt-2">
             <Button
               text="View Workout History"
@@ -40,7 +43,7 @@ export default async function Page() {
           </div>
           <div>
             <Suspense fallback={<LoadingGoal />}>
-              <GoalSection userId={user.id} />
+              <GoalSection userId={userId} />
             </Suspense>
           </div>
         </section>
